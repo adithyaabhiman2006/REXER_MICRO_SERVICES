@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Offline — Rexer Micro-Tools</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #0b0f19;
+        color: #fff;
+        text-align: center;
+        padding: 1.5rem;
+      }
+      .box {
+        max-width: 28rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin: 1rem 0 0.5rem;
+      }
+      p {
+        color: #a3b1c6;
+        line-height: 1.5;
+      }
+      a {
+        display: inline-block;
+        margin-top: 1.25rem;
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.6rem;
+        background: linear-gradient(135deg, #0057ff, #00e5ff);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .badge {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin: 0 auto;
+        border-radius: 0.9rem;
+        background: linear-gradient(135deg, #0057ff, #00e5ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="badge">R</div>
+      <h1>You’re offline</h1>
+      <p>
+        Rexer Micro-Tools can’t reach the network right now. Tools you’ve already
+        opened keep working, and you’ll reconnect automatically.
+      </p>
+      <a href="./">Try again</a>
+    </div>
+  </body>
+</html>

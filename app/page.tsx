@@ -55,7 +55,7 @@ export default function HomePage() {
               <Zap className="size-3.5 text-accent" /> Instant, client-side processing
             </li>
             <li className="inline-flex items-center gap-1.5">
-              <Sparkles className="size-3.5 text-accent" /> {tools.length} sample tools live · 200 coming
+              <Sparkles className="size-3.5 text-accent" /> {tools.length} tools · installable PWA
             </li>
           </ul>
         </div>

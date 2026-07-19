@@ -1,89 +1,136 @@
 # Rexer Micro-Tools
 
-A premium, privacy-first micro-tools platform (200 tools) with client-side
-processing wherever possible, a PWA-native feel, and a clean modern UI.
+> **200 premium, privacy-first micro-tools.** Convert, generate, and transform
+> images, PDFs, audio, code, and text — right in your browser. Installable PWA.
+> Nothing is uploaded. Nothing is logged.
 
-> **Status:** Step 1 of 12 — project scaffold, design foundation, navigation
-> shell, and a searchable tool grid (sample 5-item registry) are in place.
-> See the roadmap below.
+**Live demo:** once GitHub Pages is enabled (see below) the site is at
+`https://adithyaabhiman2006.github.io/REXER_MICRO_SERVICES/`
 
-## Principles
+---
 
-- **Privacy-first** — non-AI tools process everything client-side. No file uploads.
-- **AI tools** use cloud APIs via env keys only; content is processed ephemerally and never stored or logged.
-- **Accessibility (WCAG AA)** and keyboard-first UX.
-- **SEO-friendly** with clean meta/OG. Targets: Lighthouse 95+, CLS < 0.1.
-- **Legal/TOS** — social media downloaders respect platform TOS; disallowed tools degrade gracefully.
+## ✨ What's built so far
 
-## Tech stack
+| Area | Status |
+| --- | --- |
+| **200-tool catalog** | ✅ Full registry (media, dev, seo, docs, text, finance, generators, ai) with a dedicated, prerendered page each |
+| **Fuzzy search + filters** | ✅ Client-side fuzzy search, category chips with counts |
+| **Design system** | ✅ Dark-first glassmorphism, brand gradient (`#0057FF → #00E5FF`), light/dark toggle with persistence |
+| **Navigation** | ✅ Desktop sidebar + mobile bottom nav |
+| **Working MVP tools** | ✅ **Image Converter** (WebP/HEIC/PNG/JPG), **WhatsApp DM Generator**, **Secure Password Generator** |
+| **PWA** | ✅ Manifest, icons, service worker, offline page — installable |
+| **SEO** | ✅ Per-page metadata/OG, JSON-LD, sitemap-friendly |
+| **Deployment** | ✅ Static export + GitHub Actions workflow |
 
-- **Framework:** Next.js (App Router) + React 18, TypeScript strict
-- **Styling:** Tailwind CSS + shadcn/ui (Radix) + Lucide + Framer Motion
-- **State:** Zustand
-- **PWA:** service worker + manifest (Step 8)
-- **AI backends:** Vercel Edge/Serverless, env-driven routing (Step 9)
+The remaining tools (197 of 200) render a polished "coming soon" panel and are
+on the roadmap below. Adding a new working tool is a single file + one line in
+`components/tools/index.ts`.
 
-## Getting started
+---
+
+## 🚀 Get your live link (GitHub Pages)
+
+The repo includes a ready-to-use deploy workflow at
+[`docs/github-pages-workflow.yml`](./docs/github-pages-workflow.yml). (It lives
+in `docs/` because the automation that pushed this code can't write to
+`.github/workflows/` directly — see step 1.)
+
+**Setup:**
+
+1. Copy the workflow into place:
+   ```bash
+   mkdir -p .github/workflows
+   cp docs/github-pages-workflow.yml .github/workflows/deploy.yml
+   git add .github/workflows/deploy.yml && git commit -m "ci: pages deploy" && git push
+   ```
+2. On GitHub, open **Settings → Pages**.
+3. Under **Build and deployment → Source**, choose **GitHub Actions**.
+4. The workflow builds the static site and deploys automatically. Your URL:
+   `https://<your-username>.github.io/REXER_MICRO_SERVICES/`
+
+> Prefer Vercel/Netlify? Import the repo — it's a zero-config Next.js static
+> export. No env vars are required for non-AI tools.
+
+---
+
+## 🧑‍💻 Run locally
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Copy env template (AI keys are optional until Step 9)
-cp .env.example .env.local
-
-# 3. Run the dev server
 npm run dev          # http://localhost:3000
 ```
 
 ### Scripts
 
-| Command            | Description                          |
-| ------------------ | ------------------------------------ |
-| `npm run dev`      | Start the dev server                 |
-| `npm run build`    | Production build                     |
-| `npm run start`    | Run the production build             |
-| `npm run lint`     | ESLint (next/core-web-vitals)        |
-| `npm run typecheck`| TypeScript strict, no-emit           |
-| `npm run format`   | Prettier (with Tailwind class sort)  |
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (SSG) |
+| `npm run start` | Run the production build (server) |
+| `npm run typecheck` | TypeScript strict, no-emit |
+| `npm run lint` | ESLint (next/core-web-vitals) |
+| `npm run format` | Prettier (+ Tailwind class sort) |
 
-## Project structure (Step 1)
+### Build a static export locally
+
+```bash
+EXPORT_STATIC=1 \
+NEXT_PUBLIC_BASE_PATH="" \
+NEXT_PUBLIC_APP_URL="https://example.com" \
+  npm run build      # → ./out  (serve with: npx serve out)
+```
+
+---
+
+## 🗂️ Project structure
 
 ```
 app/
-  globals.css          Design tokens + base styles (dark-first)
-  layout.tsx           Root layout, fonts, metadata/OG, theme shell
-  page.tsx             Home: hero + searchable tool grid
+  layout.tsx              Root layout, fonts, metadata/OG, theme, SW, PWA
+  page.tsx                Home: hero + searchable grid
+  tools/[slug]/page.tsx   Dynamic tool page (200 prerendered)
 components/
-  navigation/
-    Sidebar.tsx        Desktop sidebar (brand, nav, theme toggle)
-    BottomNav.tsx      Mobile bottom navigation
-  ui/
-    button.tsx         Button primitive (incl. `gradient` brand variant)
-    card.tsx           Card primitives
-  ThemeSync.tsx        Reflects store theme onto <html>
-  ToolCard.tsx         Accessible card with hover motion
-  ToolExplorer.tsx     Searchable + filterable grid (client-side)
+  navigation/             Sidebar (desktop) + BottomNav (mobile)
+  ui/                     Button, Card, Input, Textarea, Label, Badge
+  tools/                  Implemented tools (ImageConverter, WhatsApp, Password…)
+  ToolCard, ToolExplorer  Grid + fuzzy search
+  ThemeSync, ServiceWorkerRegister
 lib/
-  utils.ts             cn() + helpers
-  registry/tools.ts    Tools registry (5-item sample → 200 in Step 4)
-store/
-  useAppStore.ts       Zustand store (search, category, theme)
-types/
-  tools.ts             Tool/Category schema + CATEGORIES
+  registry/tools.ts       ← THE 200-tool registry (edit here)
+  search.ts               Dependency-free fuzzy search
+  categories.ts           Category → icon + gradient
+  faq.ts                  Per-tool FAQ generator
+store/useAppStore.ts      Zustand (search, category, theme)
+.github/workflows/deploy.yml   Build + deploy to Pages
 ```
 
-## Roadmap
+## ➕ Add a new working tool
 
-1. ✅ **Step 1** — Scaffold, navigation shell, searchable grid
-2. ⏳ **Step 2** — Full design system (tokens, themes, polished ToolCard, light/dark)
-3. ⏳ **Step 3** — Fuzzy search + master grid over the registry
-4. ⏳ **Step 4** — Route scaffolding for all 200 tools (generator script)
-5. ⏳ **Step 5** — MVP tools (image converter, WhatsApp link, password generator)
-6. ⏳ **Step 6** — Media utilities infra (drag-drop, ffmpeg.wasm worker loader)
-7. ⏳ **Step 7** — PDF utilities infra (pdf-lib, OCR via tesseract.js)
-8. ⏳ **Step 8** — PWA (manifest, service worker, offline, iOS splash)
-9. ⏳ **Step 9** — AI tools framework (rate-limited, provider-agnostic)
-10. ⏳ **Step 10** — CI/CD & quality (ESLint, Vitest, Playwright, Lighthouse CI)
-11. ⏳ **Step 11** — Deployment (Vercel, analytics, secrets)
-12. ⏳ **Step 12** — Handover docs (README, CONTRIBUTING, tools-registry guide)
+1. Create `components/tools/MyTool.tsx` (a default-exported React component).
+2. Register it in `components/tools/index.ts`:
+   ```ts
+   "my-tool-slug": dynamic(() => import("@/components/tools/MyTool")),
+   ```
+3. Ensure the slug exists in `lib/registry/tools.ts`. Done — the page renders it.
+
+## 🔒 Privacy & principles
+
+- Non-AI tools process everything **client-side**. No file uploads.
+- AI tools (roadmap) use cloud APIs via env keys only; content is processed
+  ephemerally and never stored or logged.
+- WCAG AA-minded, keyboard-first, reduced-motion aware.
+
+## 🗺️ Roadmap
+
+1. ✅ Scaffold + navigation + searchable grid
+2. ✅ Design system (tokens, themes, polished cards, light/dark)
+3. ✅ Fuzzy search over the full registry
+4. ✅ All 200 tool routes prerendered
+5. ✅ MVP tools: image converter, WhatsApp link, password generator
+6. ⏳ Media utilities infra (drag-drop, ffmpeg.wasm worker)
+7. ⏳ PDF utilities infra (pdf-lib, OCR via tesseract.js)
+8. ✅ PWA (manifest, service worker, offline, icons)
+9. ⏳ AI tools framework (rate-limited, provider-agnostic)
+10. ⏳ CI/CD quality (Vitest, Playwright, Lighthouse CI)
+11. ⏳ Deployment polish (Vercel config, analytics, secrets)
+12. ⏳ Handover docs (CONTRIBUTING, tools-registry guide)
