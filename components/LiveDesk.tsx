@@ -52,7 +52,7 @@ function formatBytes(bytes: number) {
 }
 
 export function LiveDesk() {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [note, setNote] = useState("");
   const [noteReady, setNoteReady] = useState(false);
   const [clipboardStatus, setClipboardStatus] = useState("Local autosave");
@@ -66,6 +66,7 @@ export function LiveDesk() {
   const [recentSlugs, setRecentSlugs] = useState<string[]>([]);
 
   useEffect(() => {
+    setNow(new Date());
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     setOnline(navigator.onLine);
     const goOnline = () => setOnline(true);
@@ -148,18 +149,22 @@ export function LiveDesk() {
   );
   const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
   const remaining = String(seconds % 60).padStart(2, "0");
-  const time = new Intl.DateTimeFormat("en-LK", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Colombo",
-  }).format(now);
-  const date = new Intl.DateTimeFormat("en-LK", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    timeZone: "Asia/Colombo",
-  }).format(now);
+  const time = now
+    ? new Intl.DateTimeFormat("en-LK", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Colombo",
+      }).format(now)
+    : "--:--";
+  const date = now
+    ? new Intl.DateTimeFormat("en-LK", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        timeZone: "Asia/Colombo",
+      }).format(now)
+    : "Local time loading";
 
   const copyNote = async () => {
     try {
