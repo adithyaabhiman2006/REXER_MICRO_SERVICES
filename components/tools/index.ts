@@ -1,38 +1,25 @@
-/**
- * Rexer Micro-Tools — tool registry.
- *
- * Maps each tool slug to a component. Imports ALL tools from a small set of
- * consolidated files (tools-part1/2/3) plus the 3 original MVP files, giving
- * you ~78 working tools with ZERO new dependencies.
- */
 import { createElement } from "react";
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 
-// Original MVP tools (already on the repo as separate files).
 const PasswordGenerator = dynamic(() => import("@/components/tools/PasswordGenerator"));
 const ImageConverter = dynamic(() => import("@/components/tools/ImageConverter"));
 const WhatsAppGenerator = dynamic(() => import("@/components/tools/WhatsAppGenerator"));
 
-// Consolidated tool sets.
 import * as P1 from "@/components/tools/tools-part1";
 import * as P2 from "@/components/tools/tools-part2";
 import * as P3 from "@/components/tools/tools-part3";
 
-/** Wrappers for parameterized tools (no JSX — uses createElement). */
 const wrap = (Comp: ComponentType<any>, props: Record<string, any> = {}) => {
   const C = () => createElement(Comp, props);
-  C.displayName = `Wrapped(${Comp.displayName || Comp.name || "Component"})`;
+  C.displayName = "Wrapped";
   return C;
 };
 
 export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
-  // Original MVP
   "password-generator": PasswordGenerator,
   "image-converter": ImageConverter,
   "whatsapp-dm-generator": WhatsAppGenerator,
-
-  // Text & docs (part1)
   "word-counter": P1.WordCounter,
   "case-converter": P1.CaseConverter,
   "find-and-replace": P1.FindAndReplace,
@@ -42,8 +29,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "remove-line-breaks": P1.RemoveLineBreaks,
   "extract-emails-urls": P1.ExtractEmailsUrls,
   "notepad": P1.Notepad,
-
-  // Developer (part1)
   "json-formatter": P1.JsonFormatter,
   "json-validator": P1.JsonValidator,
   "json-to-csv": P1.JsonToCsv,
@@ -65,8 +50,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "token-counter": P1.TokenCounter,
   "cron-builder": P1.CronBuilder,
   "color-converter": P1.ColorConverter,
-
-  // Converters (part2)
   "text-reverser": P2.TextReverser,
   "lorem-ipsum": P2.LoremIpsum,
   "random-text": P2.RandomText,
@@ -76,8 +59,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "unit-converter": P2.UnitConverter,
   "timezone-converter": P2.TimezoneConverter,
   "currency-converter": P2.CurrencyConverter,
-
-  // Calculators / finance (part2)
   "percentage-calculator": P2.PercentageCalculator,
   "bmi-calculator": P2.BmiCalculator,
   "age-calculator": P2.AgeCalculator,
@@ -104,8 +85,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "paye-tax": wrap(P2.PayeTax, { label: "Gross annual income" }),
   "paycheck-calculator": P2.PayeTax,
   "barcode-generator": P2.BarcodeGenerator,
-
-  // Generators / productivity (part3)
   "username-generator": P3.UsernameGenerator,
   "business-name-generator": P3.BusinessNameGenerator,
   "random-name-picker": P3.RandomNamePicker,
@@ -116,8 +95,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "typing-test": P3.TypingTest,
   "emoji-picker": P3.EmojiPicker,
   "fancy-text": P3.FancyText,
-
-  // Media (part3)
   "image-compressor": P3.ImageCompressor,
   "image-resizer": P3.ImageResizer,
   "image-rotator": P3.ImageRotator,
@@ -128,8 +105,6 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "color-picker-from-image": P3.ColorPickerFromImage,
   "png-to-jpg": P3.PngToJpg,
   "image-watermark": P3.ImageWatermark,
-
-  // SEO (part3)
   "meta-og-generator": P3.MetaOgGenerator,
   "robots-txt-generator": P3.RobotsTxtGenerator,
   "sitemap-generator": P3.SitemapGenerator,
