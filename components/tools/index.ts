@@ -5,11 +5,13 @@ import type { ComponentType } from "react";
 const PasswordGenerator = dynamic(() => import("@/components/tools/PasswordGenerator"));
 const ImageConverter = dynamic(() => import("@/components/tools/ImageConverter"));
 const WhatsAppGenerator = dynamic(() => import("@/components/tools/WhatsAppGenerator"));
+const QrCodeGenerator = dynamic(() => import("@/components/tools/QrCodeGeneratorCDN"));
 
 import * as P1 from "@/components/tools/tools-part1";
 import * as P2 from "@/components/tools/tools-part2";
 import * as P3 from "@/components/tools/tools-part3";
 import * as P4 from "@/components/tools/tools-part4";
+import * as P5 from "@/components/tools/tools-part5";
 
 const wrap = (Comp: ComponentType<any>, props: Record<string, any> = {}) => {
   const C = () => createElement(Comp, props);
@@ -21,6 +23,7 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "password-generator": PasswordGenerator,
   "image-converter": ImageConverter,
   "whatsapp-dm-generator": WhatsAppGenerator,
+  "qr-code-generator": QrCodeGenerator,
   "word-counter": P1.WordCounter,
   "case-converter": P1.CaseConverter,
   "find-and-replace": P1.FindAndReplace,
@@ -126,6 +129,27 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "grade-calculator": P4.GradeCalculator,
   "invoice-generator": P4.InvoiceGenerator,
   "handwriting-text": P4.HandwritingText,
+  "pdf-merge": P5.PdfMerge,
+  "pdf-split": P5.PdfSplit,
+  "pdf-watermark": P5.PdfWatermark,
+  "pdf-extract-text": P5.PdfExtractText,
+  "markdown-to-html": P5.MarkdownToHtml,
+  "text-diff": P5.TextDiff,
+  "heic-to-jpg": P5.HeicToJpg,
+  "audio-converter": P5.AudioConverter,
+  "audio-trimmer": P5.AudioTrimmer,
+  "audio-reverse": P5.AudioReverse,
+  "video-converter": P5.VideoConverter,
+  "video-compressor": P5.VideoCompressor,
+  "video-mute": P5.VideoMute,
+  "video-to-audio": P5.VideoToAudio,
+  "video-to-gif": P5.VideoToGif,
+  "ai-text-rewriter": P5.AiTextRewriter,
+  "ai-paraphraser": P5.AiParaphraser,
+  "ai-grammar-checker": P5.AiGrammarChecker,
+  "ai-email-writer": P5.AiEmailWriter,
+  "ai-headline-generator": P5.AiHeadlineGenerator,
+  "ai-translator": P5.AiTranslator,
 };
 
 export const SOCIAL_DOWNLOADERS: Record<string, string> = {};
