@@ -9,6 +9,7 @@ const WhatsAppGenerator = dynamic(() => import("@/components/tools/WhatsAppGener
 import * as P1 from "@/components/tools/tools-part1";
 import * as P2 from "@/components/tools/tools-part2";
 import * as P3 from "@/components/tools/tools-part3";
+import * as P4 from "@/components/tools/tools-part4";
 
 const wrap = (Comp: ComponentType<any>, props: Record<string, any> = {}) => {
   const C = () => createElement(Comp, props);
@@ -109,6 +110,22 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "robots-txt-generator": P3.RobotsTxtGenerator,
   "sitemap-generator": P3.SitemapGenerator,
   "keyword-density": P3.KeywordDensity,
+  "image-cropper": P4.ImageCropper,
+  "photo-filters": P4.PhotoFilters,
+  "meme-generator": P4.MemeGenerator,
+  "svg-to-png": P4.SvgToPng,
+  "screen-recorder": P4.ScreenRecorder,
+  "frame-grabber": P4.FrameGrabber,
+  "image-background-color": P4.ImageBackgroundColor,
+  "css-gradient": P4.CssGradientGenerator,
+  "css-shadow": P4.CssShadowGenerator,
+  "glassmorphism": P4.GlassmorphismGenerator,
+  "json-to-typescript": P4.JsonToTypescript,
+  "money-manager": P4.MoneyManager,
+  "rent-vs-buy": P4.RentVsBuy,
+  "grade-calculator": P4.GradeCalculator,
+  "invoice-generator": P4.InvoiceGenerator,
+  "handwriting-text": P4.HandwritingText,
 };
 
 export const SOCIAL_DOWNLOADERS: Record<string, string> = {};
