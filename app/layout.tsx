@@ -8,6 +8,7 @@ import { ThemeSync } from "@/components/ThemeSync";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CommandPalette } from "@/components/CommandPalette";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 // Offline-safe bundled Geist font (no build-time network fetch).
 const font = GeistSans;
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground">
         <ThemeSync />
+        <ScrollProgress />
         <TopNav />
         <CommandPalette />
         <main id="main" className="min-h-screen pb-16 pt-16 md:pb-0">

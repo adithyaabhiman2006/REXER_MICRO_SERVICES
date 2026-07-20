@@ -1,149 +1,88 @@
-import Link from "next/link";
-import { ArrowDownRight, Check, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { ArrowDownRight, Sparkles } from "lucide-react";
 
-import { HeroStage } from "@/components/HeroStage";
+import { CampaignHero } from "@/components/CampaignHero";
 import { FeaturedTools } from "@/components/FeaturedTools";
-import { ToolExplorer } from "@/components/ToolExplorer";
 import { IntentLauncher } from "@/components/IntentLauncher";
-import { CommandTrigger } from "@/components/CommandTrigger";
-import { Button } from "@/components/ui/button";
+import { ToolExplorer } from "@/components/ToolExplorer";
 
 export default function HomePage() {
   return (
     <>
-      <section className="relative isolate min-h-[calc(100vh-4rem)] overflow-hidden border-b border-white/10 bg-[#090a0c] text-white">
-        <div
-          className="hero-grid pointer-events-none absolute inset-0 opacity-40"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -left-40 top-32 size-[30rem] rounded-full bg-rex-violet/15 blur-[120px]"
-          aria-hidden="true"
-        />
-        <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-[1600px] items-center gap-0 px-4 py-10 sm:px-6 lg:grid-cols-[.82fr_1.18fr] lg:px-10 lg:py-0">
-          <div className="relative z-10 max-w-2xl">
-            <div className="mb-8 flex items-center gap-3">
-              <span className="rounded-full bg-rex-lime px-3 py-1 text-[10px] font-black uppercase tracking-[.18em] text-black">
-                Version 2.0
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-[.2em] text-white/45">
-                The browser’s creative utility system
-              </span>
-            </div>
+      <CampaignHero />
 
-            <h1 className="text-[clamp(3.65rem,7.5vw,7.8rem)] font-black leading-[.79] tracking-[-.085em]">
-              ONE TAB.
-              <br />
-              <span className="text-rex-lime">200 WAYS</span>
-              <br />
-              FORWARD.
-            </h1>
-            <p className="mt-8 max-w-lg text-base font-medium leading-relaxed text-white/55 sm:text-lg">
-              Stop jumping between random websites. Convert files, shape ideas and finish everyday
-              work inside one focused creative system.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                asChild
-                variant="gradient"
-                size="lg"
-                className="h-14 rounded-full px-7 text-sm font-black"
-              >
-                <Link href="#tools-heading">
-                  Explore all tools <ArrowDownRight className="size-4" />
-                </Link>
-              </Button>
-              <CommandTrigger />
-            </div>
-
-            <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-[11px] font-bold uppercase tracking-[.12em] text-white/45">
-              <span className="flex items-center gap-2">
-                <Check className="size-3.5 text-rex-lime" />
-                200 working tools
-              </span>
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="size-3.5 text-rex-lime" />
-                Local-first privacy
-              </span>
-              <span className="flex items-center gap-2">
-                <Zap className="size-3.5 text-rex-lime" />
-                Zero sign-up
-              </span>
-            </div>
-          </div>
-
-          <HeroStage />
-        </div>
-        <div className="absolute bottom-5 right-5 hidden items-center gap-2 text-[9px] font-bold uppercase tracking-[.22em] text-white/35 lg:flex">
-          <span className="h-px w-12 bg-border" />
-          Move your cursor
-        </div>
-      </section>
-
-      <section
-        className="overflow-hidden border-b border-border bg-foreground py-4 text-background"
-        aria-label="Platform highlights"
-      >
+      <section className="overflow-hidden border-y border-black bg-rex-lime py-4 text-black" aria-label="Platform highlights">
         <div className="marquee-track flex min-w-max items-center gap-10 whitespace-nowrap text-xs font-black uppercase tracking-[.22em]">
           {[
-            "200 working tools",
-            "Private by default",
-            "Creative without limits",
-            "Installable PWA",
+            "200 tools in motion",
             "Files stay local",
-            "Built for speed",
-            "200 working tools",
-            "Private by default",
-            "Creative without limits",
+            "Make without friction",
+            "No account needed",
+            "Built for the browser",
+            "200 tools in motion",
+            "Files stay local",
+            "Make without friction",
           ].map((item, index) => (
             <span key={`${item}-${index}`} className="flex items-center gap-10">
-              <Sparkles className="size-3.5 text-rex-coral" />
+              <Sparkles className="size-3.5 fill-black" />
               {item}
             </span>
           ))}
         </div>
       </section>
 
-      <section
-        className="mx-auto grid max-w-[1440px] border-x border-border lg:grid-cols-3"
-        aria-label="Why Rexer"
-      >
-        {[
-          {
-            number: "01",
-            title: "Your files stay yours",
-            text: "Compatible conversions happen on your device—not in a mystery cloud.",
-          },
-          {
-            number: "02",
-            title: "Everything feels familiar",
-            text: "Drop a file, adjust what matters, download. Every tool follows the same rhythm.",
-          },
-          {
-            number: "03",
-            title: "Power without the noise",
-            text: "Serious browser engines, wrapped in an interface that gets out of your way.",
-          },
-        ].map((item) => (
-          <article
-            key={item.number}
-            className="group border-b border-border p-7 transition-colors hover:bg-rex-lime hover:text-black lg:border-b-0 lg:border-r lg:p-10 lg:last:border-r-0"
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs opacity-50">/{item.number}</span>
-              <ArrowDownRight className="size-5 transition-transform group-hover:rotate-[-45deg]" />
+      <section className="relative overflow-hidden border-b border-border px-4 py-24 sm:px-6 lg:py-40">
+        <span className="absolute -right-10 top-0 select-none text-[22rem] font-black leading-none tracking-[-.1em] text-foreground/[.025]" aria-hidden="true">
+          RX
+        </span>
+        <div className="relative mx-auto max-w-[1440px]">
+          <div className="grid gap-12 lg:grid-cols-[220px_1fr]">
+            <div>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[.24em] text-rex-coral">
+                The Rexer idea / 001
+              </p>
+              <p className="mt-5 max-w-[180px] text-xs font-semibold leading-relaxed text-muted-foreground">
+                The useful internet should feel fast, clear and completely yours.
+              </p>
             </div>
-            <h2 className="mt-16 max-w-xs text-2xl font-black tracking-[-.045em]">{item.title}</h2>
-            <p className="mt-3 max-w-sm text-sm font-medium leading-relaxed opacity-60">
-              {item.text}
-            </p>
-          </article>
-        ))}
+            <div>
+              <h2 className="max-w-6xl text-[clamp(3.3rem,8vw,8.5rem)] font-black leading-[.82] tracking-[-.085em]">
+                LESS CLICKING.
+                <br />
+                <span className="text-rex-violet">MORE MAKING.</span>
+                <br />
+                KEEP MOVING.
+              </h2>
+              <div className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-3">
+                {[
+                  ["200", "Working tools, one familiar rhythm"],
+                  ["0", "Accounts, subscriptions or unnecessary gates"],
+                  ["1", "Focused browser tab from start to finish"],
+                ].map(([value, label]) => (
+                  <div key={value} className="bg-background p-6 sm:p-8">
+                    <p className="text-5xl font-black tracking-[-.07em]">{value}</p>
+                    <p className="mt-8 max-w-[180px] text-xs font-semibold leading-relaxed text-muted-foreground">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <IntentLauncher />
       <FeaturedTools />
+
+      <section className="overflow-hidden border-y border-border bg-rex-coral py-8 text-black sm:py-12">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-8 px-4 sm:px-6 lg:px-10">
+          <p className="text-[clamp(2.4rem,6vw,6rem)] font-black leading-[.82] tracking-[-.075em]">
+            YOUR NEXT MOVE
+            <br />
+            IS ALREADY HERE.
+          </p>
+          <ArrowDownRight className="size-12 shrink-0 sm:size-20" strokeWidth={1.25} />
+        </div>
+      </section>
+
       <ToolExplorer />
     </>
   );

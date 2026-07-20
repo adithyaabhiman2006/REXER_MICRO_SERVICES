@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Lock, Tag } from "lucide-react";
+import { ArrowDownRight, ArrowLeft, Lock, ShieldCheck, Tag, Zap } from "lucide-react";
 
 import { ToolActionPanel } from "@/components/ToolActionPanel";
 import { CategoryGlyph } from "@/components/CategoryGlyph";
@@ -54,7 +54,7 @@ export default function ToolPage({ params }: PageProps) {
   };
 
   return (
-    <article className="mx-auto w-full max-w-[1180px] px-4 py-7 pb-28 sm:px-6 lg:px-10 lg:py-12">
+    <article className="mx-auto w-full max-w-[1440px] px-4 py-7 pb-28 sm:px-6 lg:px-10 lg:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -73,9 +73,15 @@ export default function ToolPage({ params }: PageProps) {
         </Link>
       </Button>
 
-      {/* Header */}
-      <header className="mb-10 grid gap-8 border-b border-border pb-10 lg:grid-cols-[1fr_280px] lg:items-end">
-        <div>
+      <header className="relative min-h-[430px] overflow-hidden rounded-[2rem] bg-[#090a0c] p-6 text-white sm:p-9 lg:min-h-[500px] lg:p-12">
+        <span className="pointer-events-none absolute -bottom-16 right-0 select-none text-[15rem] font-black leading-none tracking-[-.1em] text-white/[.035] sm:text-[24rem]" aria-hidden="true">
+          {String(tool.id).padStart(3, "0")}
+        </span>
+        <div className="absolute right-6 top-6 flex items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[.18em] text-white/35 sm:right-9 sm:top-9">
+          <span className="size-1.5 animate-pulse rounded-full bg-rex-lime" /> Live workspace
+        </div>
+        <div className="relative z-10 flex h-full min-h-[370px] flex-col justify-between lg:min-h-[405px]">
+          <div>
           <div className="flex items-center gap-2">
             <Badge variant="accent" className="capitalize">
               <Tag className="size-3" />
@@ -87,46 +93,44 @@ export default function ToolPage({ params }: PageProps) {
               </Badge>
             )}
           </div>
-          <h1 className="mt-5 flex items-center gap-4 text-4xl font-black leading-[.9] tracking-[-.06em] sm:text-6xl">
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-rex-lime text-black shadow-[inset_0_-4px_0_rgba(0,0,0,.16)]">
-              <CategoryGlyph category={tool.category} className="size-6" />
-            </span>
+          <h1 className="mt-8 max-w-5xl text-[clamp(3.4rem,8.5vw,8.6rem)] font-black leading-[.78] tracking-[-.085em]">
             {tool.title}
           </h1>
-          <p className="mt-5 max-w-2xl text-base font-medium leading-relaxed text-muted-foreground">
-            {tool.short}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {tool.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-md bg-secondary/50 px-2 py-0.5 text-xs text-muted-foreground"
-              >
-                #{tag}
-              </span>
-            ))}
+          </div>
+          <div className="grid gap-7 border-t border-white/15 pt-6 lg:grid-cols-[70px_1fr_280px] lg:items-end">
+            <span className="flex size-14 items-center justify-center rounded-full bg-rex-lime text-black shadow-[inset_0_-4px_0_rgba(0,0,0,.16)]">
+              <CategoryGlyph category={tool.category} className="size-6" />
+            </span>
+            <div>
+              <p className="max-w-2xl text-sm font-medium leading-relaxed text-white/55 sm:text-base">{tool.short}</p>
+              <div className="mt-3 flex flex-wrap gap-3 font-mono text-[9px] uppercase tracking-[.15em] text-white/30">
+                {tool.tags.map((tag) => <span key={tag}>#{tag}</span>)}
+              </div>
+            </div>
+            <div className="flex items-center justify-between lg:border-l lg:border-white/15 lg:pl-7">
+              <div>
+                <p className="font-mono text-[9px] font-bold uppercase tracking-[.2em] text-rex-coral">Tool / {String(tool.id).padStart(3, "0")}</p>
+                <p className="mt-2 text-xs font-semibold text-white/45">Simple in. Useful out.</p>
+              </div>
+              <ArrowDownRight className="size-7 text-white/35" />
+            </div>
           </div>
         </div>
-        <aside className="rounded-2xl border border-border bg-card p-5">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[.2em] text-rex-coral">
-            Tool / {String(tool.id).padStart(3, "0")}
-          </p>
-          <p className="mt-5 text-sm font-bold">Simple in. Useful out.</p>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            No account required. Your workspace resets when you leave.
-          </p>
-        </aside>
       </header>
 
-      {/* Action panel (implemented tool or placeholder) */}
-      <section aria-label={`${tool.title} tool`} className="mb-16">
+      <section aria-label={`${tool.title} tool`} className="relative z-10 mx-auto -mt-5 mb-16 max-w-[1120px] sm:-mt-8">
         <ToolActionPanel slug={tool.slug} title={tool.title} category={tool.category} />
+        <div className="mt-4 flex flex-wrap justify-center gap-x-7 gap-y-2 text-[9px] font-bold uppercase tracking-[.14em] text-muted-foreground">
+          <span className="flex items-center gap-1.5"><ShieldCheck className="size-3 text-rex-lime" /> Privacy first</span>
+          <span className="flex items-center gap-1.5"><Zap className="size-3 text-rex-coral" /> Instant start</span>
+          <span className="flex items-center gap-1.5"><Lock className="size-3 text-rex-violet" /> No account</span>
+        </div>
       </section>
 
       {/* FAQ */}
       <section
         aria-label="Frequently asked questions"
-        className="grid gap-6 border-t border-border pt-12 lg:grid-cols-[280px_1fr]"
+        className="grid gap-8 border-t border-border pt-16 lg:grid-cols-[320px_1fr]"
       >
         <div>
           <span className="font-mono text-[9px] font-bold uppercase tracking-[.2em] text-rex-coral">

@@ -20,15 +20,16 @@ export function ToolActionPanel({ slug, title }: ToolActionPanelProps) {
 
   if (ToolComponent) {
     return (
-      <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_30px_90px_-50px_rgba(0,0,0,.7)]">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3 text-[9px] font-bold uppercase tracking-[.18em] text-muted-foreground sm:px-7">
+      <div className="overflow-hidden rounded-[1.5rem] border border-border bg-background shadow-[0_35px_100px_-45px_rgba(0,0,0,.8)] sm:rounded-[2rem]">
+        <div className="flex items-center justify-between bg-foreground px-5 py-3 text-[9px] font-bold uppercase tracking-[.18em] text-background/55 sm:px-7">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="size-3.5 text-rex-lime" />
+            <span className="flex gap-1.5" aria-hidden="true"><i className="size-2 rounded-full bg-rex-coral" /><i className="size-2 rounded-full bg-[#FFD66B]" /><i className="size-2 rounded-full bg-rex-lime" /></span>
+            <CheckCircle2 className="ml-2 size-3.5 text-rex-lime" />
             Ready to use
           </span>
-          <span>Local workspace</span>
+          <span className="font-mono">Rexer / Local workspace</span>
         </div>
-        <div className="p-5 sm:p-8">
+        <div className="p-5 sm:p-9 lg:p-10">
           <ToolComponent />
         </div>
       </div>
