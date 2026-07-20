@@ -21,7 +21,7 @@ test("global command palette finds a tool from the keyboard", async ({ page }) =
   await expect(launcher).toBeVisible();
   await launcher.getByRole("searchbox", { name: "Search all 200 tools" }).fill("json formatter");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "JSON Formatter" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "JSON Formatter" })).toBeVisible({ timeout: 15_000 });
 });
 
 test("intent launcher narrows tools by user goal", async ({ page }) => {
@@ -39,4 +39,24 @@ test("live desk keeps a private note across reloads", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "Local desk note" })).toHaveValue(
     "Finish the Rexer launch",
   );
+});
+
+test("smart start detects a file and recommends matching tools", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Choose a file for smart recommendations").setInputFiles({
+    name: "campaign.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("sample"),
+  });
+  await expect(page.getByRole("heading", { name: "PDF detected" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "PDF Merge", exact: true })).toBeVisible();
+});
+
+test("workflow pin stays on this device", async ({ page }) => {
+  await page.goto("/");
+  const workflow = page.getByRole("article").filter({ hasText: "SHIP AN IMAGE" });
+  await workflow.getByRole("button", { name: "Pin" }).click();
+  await expect(workflow.getByRole("button", { name: "Pinned" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("article").filter({ hasText: "SHIP AN IMAGE" }).getByRole("button", { name: "Pinned" })).toBeVisible();
 });

@@ -15,6 +15,9 @@ studios.
 | --- | --- |
 | 200-tool registry and static routes | Complete |
 | Fuzzy search and eight category filters | Complete |
+| Smart file detection and contextual recommendations | Complete; metadata-only until a tool is opened |
+| Reusable three-step workflow recipes | Complete; favorite recipe persists locally |
+| Live Desk | Weather/time, rates, notes, timer, device status, and recent tools |
 | Interactive component mappings | 200 / 200 |
 | PDF merge, split, watermark, resize, forms, signatures | Working locally with `pdf-lib` |
 | AI writing, code, image, speech, and document studios | Working; cloud use is disclosed in-tool |
@@ -26,6 +29,24 @@ studios.
 Specialist routes use bundled browser engines for GIF, EXIF, DOCX, PDF, audio,
 video, and image work. Smart-media fallbacks disclose when processing is local
 and deterministic instead of presenting it as an undisclosed remote AI model.
+
+## Product experience
+
+- **Smart Start** recognizes PDFs, images, video, audio, and structured-data files,
+  then recommends the most relevant tools without uploading the selected file.
+- **Workflow recipes** connect related tools into practical sequences for image
+  delivery, PDF handoff, website launch, and API cleanup. A preferred recipe can
+  be pinned in local browser storage.
+- **Live Desk** adds a persistent scratch note, focus timer, recent tools, browser
+  status, Colombo weather, and reference exchange rates.
+- **Global command search** opens with `Ctrl/Cmd + K` and searches all 200 tools.
+
+The interaction model was benchmarked against broad utility suites such as
+[TinyWow](https://tinywow.com/tools), [iLovePDF](https://www.ilovepdf.com/),
+[123apps](https://123apps.com/), [Convertio](https://convertio.co/),
+[Photopea](https://www.photopea.com/), [DevToys](https://devtoys.app/), and
+[Raycast](https://www.raycast.com/). Rexer combines their strongest discovery
+patterns with a distinct local-first, editorial interface.
 
 ## Run locally
 

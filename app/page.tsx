@@ -5,6 +5,7 @@ import { FeaturedTools } from "@/components/FeaturedTools";
 import { IntentLauncher } from "@/components/IntentLauncher";
 import { ToolExplorer } from "@/components/ToolExplorer";
 import { LiveDesk } from "@/components/LiveDesk";
+import { SmartStart } from "@/components/SmartStart";
 
 export default function HomePage() {
   return (
@@ -30,6 +31,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <SmartStart />
 
       <section className="relative overflow-hidden border-b border-border px-4 py-24 sm:px-6 lg:py-40">
         <span className="absolute -right-10 top-0 select-none text-[22rem] font-black leading-none tracking-[-.1em] text-foreground/[.025]" aria-hidden="true">
