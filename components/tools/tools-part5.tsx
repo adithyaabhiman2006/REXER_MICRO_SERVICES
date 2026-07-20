@@ -39,8 +39,10 @@ async function loadFFmpeg(): Promise<{ ffmpeg: any; fetchFile: any }> {
     const { FFmpeg } = FFmpegWASM;
     const { fetchFile, toBlobURL } = FFmpegUtil;
     const ffmpeg = new FFmpeg();
+    const ffmpegBase = "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd";
     const coreBase = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
     await ffmpeg.load({
+      classWorkerURL: await toBlobURL(`${ffmpegBase}/814.ffmpeg.js`, "text/javascript"),
       coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
       wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm"),
     });
