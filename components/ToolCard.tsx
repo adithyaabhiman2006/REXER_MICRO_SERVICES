@@ -4,68 +4,59 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
 import { CategoryGlyph } from "@/components/CategoryGlyph";
-import { CATEGORY_GRADIENTS } from "@/lib/categories";
-import { CATEGORIES } from "@/types/tools";
 import type { Tool, ToolCategory } from "@/types/tools";
+import { CATEGORIES } from "@/types/tools";
 
-interface ToolCardProps {
-  tool: Tool;
-  /** Stagger index for entrance animation. */
-  index?: number;
-}
-
-const CATEGORY_LABEL: Record<ToolCategory, string> = Object.fromEntries(
-  CATEGORIES.map((c) => [c.id, c.label]),
+const categoryColor: Record<ToolCategory, string> = {
+  media: "bg-rex-coral",
+  dev: "bg-rex-violet",
+  seo: "bg-rex-lime",
+  docs: "bg-rex-sky",
+  text: "bg-[#FFD66B]",
+  finance: "bg-[#72E6A5]",
+  generators: "bg-[#FF9ED2]",
+  ai: "bg-[#BBA7FF]",
+};
+const categoryName = Object.fromEntries(
+  CATEGORIES.map((category) => [category.id, category.label]),
 ) as Record<ToolCategory, string>;
 
-/**
- * Accessible tool card with category icon, gradient accent and hover motion.
- */
-export function ToolCard({ tool, index = 0 }: ToolCardProps) {
-  const gradient = CATEGORY_GRADIENTS[tool.category];
-
+export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
+    <motion.article
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18, ease: "easeOut", delay: Math.min(index * 0.015, 0.18) }}
+      transition={{ duration: 0.25, delay: Math.min((index % 8) * 0.025, 0.15) }}
+      className="h-full bg-background"
     >
       <Link
         href={`/tools/${tool.slug}`}
-        className="group block focus-visible:outline-none"
         aria-label={`Open ${tool.title}`}
+        className="group flex h-full min-h-[290px] flex-col p-5 transition-colors hover:bg-card sm:p-6"
       >
-        <Card className="glass relative h-full overflow-hidden p-5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-white/20 hover:shadow-glow focus-visible:ring-2 focus-visible:ring-ring">
-          {/* Hover sheen */}
+        <div className="flex items-start justify-between">
           <span
-            aria-hidden="true"
-            className={`pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r ${gradient} opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
-          />
-
-          <div className="flex items-start justify-between gap-3">
-            <span
-              className={`flex size-9 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-sm`}
-            >
-              <CategoryGlyph category={tool.category} className="size-5" />
-            </span>
-            <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
-          </div>
-
-          <h3 className="mt-3.5 text-base font-semibold leading-snug text-foreground">
+            className={`grid size-12 place-items-center rounded-2xl text-black shadow-[inset_0_-3px_0_rgba(0,0,0,.16),0_10px_20px_-12px_rgba(0,0,0,.7)] transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 ${categoryColor[tool.category]}`}
+          >
+            <CategoryGlyph category={tool.category} className="size-5" />
+          </span>
+          <span className="grid size-10 place-items-center rounded-full border border-border text-muted-foreground transition-all group-hover:rotate-45 group-hover:border-foreground group-hover:bg-foreground group-hover:text-background">
+            <ArrowUpRight className="size-4" />
+          </span>
+        </div>
+        <div className="mt-auto pt-12">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[.18em] text-muted-foreground">
+            {categoryName[tool.category]} / {String(tool.id).padStart(3, "0")}
+          </p>
+          <h3 className="mt-3 text-xl font-black leading-[1.05] tracking-[-.045em] transition-transform group-hover:translate-x-1">
             {tool.title}
           </h3>
-          <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{tool.short}</p>
-
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
-              {CATEGORY_LABEL[tool.category]}
-            </span>
-            <span className="text-[11px] text-muted-foreground/50">#{tool.id}</span>
-          </div>
-        </Card>
+          <p className="mt-3 line-clamp-2 text-xs font-medium leading-relaxed text-muted-foreground">
+            {tool.short}
+          </p>
+        </div>
       </Link>
-    </motion.div>
+    </motion.article>
   );
 }

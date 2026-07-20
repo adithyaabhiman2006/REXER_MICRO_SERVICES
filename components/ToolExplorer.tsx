@@ -1,124 +1,170 @@
 "use client";
 
-import { useMemo } from "react";
-import { Search, X, SlidersHorizontal } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDown, Search, SlidersHorizontal, X } from "lucide-react";
 
+import { CategoryGlyph } from "@/components/CategoryGlyph";
 import { ToolCard } from "@/components/ToolCard";
 import { Button } from "@/components/ui/button";
-import { CATEGORY_ICONS } from "@/lib/categories";
 import { searchTools } from "@/lib/search";
 import { tools } from "@/lib/registry/tools";
 import { useAppStore } from "@/store/useAppStore";
 import { CATEGORIES } from "@/types/tools";
 
-/**
- * Client-side fuzzy search + category filter over the full 200-item registry.
- * All processing happens in the browser — privacy-first.
- */
+const PAGE_SIZE = 24;
+
 export function ToolExplorer() {
-  const searchQuery = useAppStore((s) => s.searchQuery);
-  const setSearchQuery = useAppStore((s) => s.setSearchQuery);
-  const activeCategory = useAppStore((s) => s.activeCategory);
-  const setActiveCategory = useAppStore((s) => s.setActiveCategory);
+  const searchQuery = useAppStore((state) => state.searchQuery);
+  const setSearchQuery = useAppStore((state) => state.setSearchQuery);
+  const activeCategory = useAppStore((state) => state.activeCategory);
+  const setActiveCategory = useAppStore((state) => state.setActiveCategory);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
-    const inCategory =
-      activeCategory === "all"
-        ? tools
-        : tools.filter((t) => t.category === activeCategory);
-    return searchTools(searchQuery, inCategory);
+    const source =
+      activeCategory === "all" ? tools : tools.filter((tool) => tool.category === activeCategory);
+    return searchTools(searchQuery, source);
   }, [searchQuery, activeCategory]);
+  const visible = filtered.slice(0, visibleCount);
+
+  useEffect(() => setVisibleCount(PAGE_SIZE), [searchQuery, activeCategory]);
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (
+        event.key === "/" &&
+        !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName)
+      ) {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
 
   return (
-    <section aria-labelledby="tools-heading" className="mx-auto w-full max-w-6xl px-4 pb-28 lg:pb-12">
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h2 id="tools-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Browse all <span className="text-gradient-accent">200 tools</span>
-        </h2>
-        <p className="max-w-lg text-sm text-muted-foreground">
-          Every tool runs in your browser. Your files and data never leave your device.
+    <section
+      id="tools-heading"
+      aria-labelledby="tools-title"
+      className="mx-auto w-full max-w-[1440px] scroll-mt-20 border-x border-border px-4 py-20 pb-28 sm:px-6 lg:px-10 lg:py-28"
+    >
+      <div className="grid items-end gap-6 lg:grid-cols-[1fr_.8fr]">
+        <div>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[.25em] text-rex-coral">
+            The full collection / 200
+          </span>
+          <h2
+            id="tools-title"
+            className="mt-4 max-w-3xl text-5xl font-black leading-[.88] tracking-[-.065em] sm:text-7xl lg:text-8xl"
+          >
+            FIND YOUR
+            <br />
+            <span className="text-rex-lime">NEXT MOVE.</span>
+          </h2>
+        </div>
+        <p className="max-w-md text-sm font-medium leading-relaxed text-muted-foreground lg:justify-self-end lg:text-base">
+          Search by what you want to accomplish. Every tool opens instantly and follows the same
+          simple workflow.
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative mx-auto mt-6 max-w-xl">
-        <Search
-          className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted-foreground"
-          aria-hidden="true"
-        />
-        <input
-          type="search"
-          inputMode="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search tools, e.g. 'pdf', 'qr', 'password'…"
-          aria-label="Search tools"
-          className="glass h-12 w-full rounded-xl border-border pl-11 pr-10 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-        {searchQuery ? (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            aria-label="Clear search"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-accent/10 hover:text-accent"
-          >
-            <X className="size-4" />
-          </button>
-        ) : null}
-      </div>
-
-      {/* Category chips */}
-      <div className="mt-5 flex flex-wrap justify-center gap-2">
-        <CategoryChip
-          id="all"
-          label="All"
-          count={tools.length}
-          active={activeCategory === "all"}
-          onClick={() => setActiveCategory("all")}
-        />
-        {CATEGORIES.map((c) => {
-          const Icon = CATEGORY_ICONS[c.id];
-          const count = tools.filter((t) => t.category === c.id).length;
-          return (
-            <CategoryChip
-              key={c.id}
-              id={c.id}
-              label={c.label}
-              count={count}
-              icon={<Icon className="size-3.5" />}
-              active={activeCategory === c.id}
-              onClick={() => setActiveCategory(c.id)}
+      <div className="sticky top-16 z-30 -mx-4 mt-12 border-y border-border bg-background/90 px-4 py-4 backdrop-blur-2xl sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+        <div className="flex flex-col gap-3 lg:flex-row">
+          <div id="tool-search" className="group relative flex-1 scroll-mt-36">
+            <Search className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-rex-lime" />
+            <input
+              ref={searchRef}
+              type="search"
+              inputMode="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="What do you want to make?"
+              aria-label="Search tools"
+              className="h-14 w-full rounded-full border border-border bg-card pl-14 pr-24 text-sm font-semibold shadow-sm transition-all placeholder:font-medium placeholder:text-muted-foreground focus-visible:border-foreground/30 focus-visible:outline-none focus-visible:ring-0 sm:h-16 sm:text-base"
             />
-          );
-        })}
+            <span className="absolute right-5 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground">
+              {filtered.length} FOUND
+            </span>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+                className="absolute right-20 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+          <div className="scroll-thin flex gap-2 overflow-x-auto pb-1 lg:max-w-[58%] lg:pb-0">
+            <CategoryChip
+              label="All"
+              count={tools.length}
+              active={activeCategory === "all"}
+              onClick={() => setActiveCategory("all")}
+            />
+            {CATEGORIES.map((category) => (
+              <CategoryChip
+                key={category.id}
+                label={category.label.replace(/ &.*$/, "")}
+                count={tools.filter((tool) => tool.category === category.id).length}
+                icon={<CategoryGlyph category={category.id} className="size-4" />}
+                active={activeCategory === category.id}
+                onClick={() => setActiveCategory(category.id)}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Results count */}
-      <p className="mt-6 flex items-center justify-center gap-1.5 text-sm text-muted-foreground" aria-live="polite">
-        <SlidersHorizontal className="size-3.5" />
-        Showing <strong className="font-semibold text-foreground">{filtered.length}</strong> of{" "}
-        {activeCategory === "all" ? tools.length : tools.filter((t) => t.category === activeCategory).length} tools
-      </p>
+      <div
+        className="mt-7 flex items-center justify-between border-b border-border pb-4 text-xs font-bold uppercase tracking-[.15em] text-muted-foreground"
+        aria-live="polite"
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal className="size-3.5" />
+          Showing {visible.length} of {filtered.length}
+        </span>
+        <span className="hidden sm:inline">Select a card to begin</span>
+      </div>
 
-      {/* Grid */}
-      {filtered.length > 0 ? (
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((tool, i) => (
-            <ToolCard key={tool.id} tool={tool} index={i} />
-          ))}
-        </div>
+      {visible.length > 0 ? (
+        <>
+          <div className="mt-5 grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {visible.map((tool, index) => (
+              <ToolCard key={tool.id} tool={tool} index={index} />
+            ))}
+          </div>
+          {visible.length < filtered.length && (
+            <div className="mt-10 flex justify-center">
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-14 rounded-full px-8 font-bold"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              >
+                Load {Math.min(PAGE_SIZE, filtered.length - visible.length)} more{" "}
+                <ArrowDown className="size-4" />
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
-        <div className="mt-12 flex flex-col items-center gap-3 text-center">
-          <p className="text-sm text-muted-foreground">No tools match “{searchQuery}”.</p>
+        <div className="mt-16 rounded-3xl border border-dashed border-border py-20 text-center">
+          <p className="text-xl font-black">Nothing matched “{searchQuery}”</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Try a shorter phrase or reset the filters.
+          </p>
           <Button
             variant="outline"
-            size="sm"
+            className="mt-5 rounded-full"
             onClick={() => {
               setSearchQuery("");
               setActiveCategory("all");
             }}
           >
-            Reset filters
+            Reset search
           </Button>
         </div>
       )}
@@ -127,14 +173,12 @@ export function ToolExplorer() {
 }
 
 function CategoryChip({
-  id,
   label,
   count,
   icon,
   active,
   onClick,
 }: {
-  id: string;
   label: string;
   count: number;
   icon?: React.ReactNode;
@@ -143,19 +187,18 @@ function CategoryChip({
 }) {
   return (
     <button
-      key={id}
       type="button"
       onClick={onClick}
       aria-pressed={active}
       className={
         active
-          ? "inline-flex items-center gap-1.5 rounded-full border border-transparent bg-gradient-accent px-3.5 py-1.5 text-xs font-medium text-white shadow-glow"
-          : "inline-flex items-center gap-1.5 rounded-full border border-border bg-card/40 px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+          ? "inline-flex h-14 shrink-0 items-center gap-2 rounded-full bg-foreground px-5 text-xs font-black text-background sm:h-16"
+          : "inline-flex h-14 shrink-0 items-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-bold text-muted-foreground transition-all hover:border-foreground/30 hover:text-foreground sm:h-16"
       }
     >
       {icon}
       {label}
-      <span className={active ? "opacity-80" : "text-muted-foreground/50"}>· {count}</span>
+      <span className="font-mono text-[9px] opacity-45">{count}</span>
     </button>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Wrench } from "lucide-react";
+import { CheckCircle2, Lock, Wrench } from "lucide-react";
 
 import { IMPLEMENTED_TOOLS } from "@/components/tools";
 
@@ -20,8 +20,17 @@ export function ToolActionPanel({ slug, title }: ToolActionPanelProps) {
 
   if (ToolComponent) {
     return (
-      <div className="glass-strong rounded-xl p-5 sm:p-6">
-        <ToolComponent />
+      <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-[0_30px_90px_-50px_rgba(0,0,0,.7)]">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3 text-[9px] font-bold uppercase tracking-[.18em] text-muted-foreground sm:px-7">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="size-3.5 text-rex-lime" />
+            Ready to use
+          </span>
+          <span>Local workspace</span>
+        </div>
+        <div className="p-5 sm:p-8">
+          <ToolComponent />
+        </div>
       </div>
     );
   }

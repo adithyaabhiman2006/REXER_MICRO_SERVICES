@@ -9,11 +9,7 @@ import type { Config } from "tailwindcss";
  */
 const config: Config = {
   darkMode: ["class"],
-  content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./lib/**/*.{ts,tsx}",
-  ],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     container: {
       center: true,
@@ -22,12 +18,7 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: [
-          "var(--font-geist-sans)",
-          "ui-sans-serif",
-          "system-ui",
-          "sans-serif",
-        ],
+        sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -63,12 +54,16 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Brand accent gradient endpoints (#0057FF → #00E5FF).
+        // High-energy editorial palette.
         rex: {
-          from: "#0057FF",
-          to: "#00E5FF",
-          bg: "#0B0F19",
-          text: "#A3B1C6",
+          from: "#CFFF2E",
+          to: "#84F7FF",
+          lime: "#CFFF2E",
+          coral: "#FF6846",
+          violet: "#9A86FF",
+          sky: "#84F7FF",
+          bg: "#090A0C",
+          text: "#A7A9AE",
         },
       },
       borderRadius: {
@@ -78,10 +73,10 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-accent":
-          "linear-gradient(135deg, var(--rex-accent-from, #0057FF) 0%, var(--rex-accent-to, #00E5FF) 100%)",
+          "linear-gradient(135deg, var(--rex-accent-from, #CFFF2E) 0%, var(--rex-accent-to, #84F7FF) 100%)",
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(0,87,255,0.25), 0 8px 30px -8px rgba(0,229,255,0.35)",
+        glow: "0 0 0 1px rgba(207,255,46,.22), 0 18px 50px -20px rgba(207,255,46,.5)",
       },
       keyframes: {
         "fade-in": {

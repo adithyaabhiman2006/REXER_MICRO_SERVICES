@@ -2,10 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
-import { Sidebar } from "@/components/navigation/Sidebar";
+import { TopNav } from "@/components/navigation/TopNav";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { ThemeSync } from "@/components/ThemeSync";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { SiteFooter } from "@/components/SiteFooter";
 
 // Offline-safe bundled Geist font (no build-time network fetch).
 const font = GeistSans;
@@ -18,9 +19,7 @@ const APP_DESCRIPTION =
   "200 premium, privacy-first micro-tools. Process images, PDFs, audio, and text client-side — your files never leave the browser.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
     default: `${APP_NAME} — 200 privacy-first micro-tools`,
     template: `%s · ${APP_NAME}`,
@@ -61,7 +60,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B0F19",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F8F7F2" },
+    { media: "(prefers-color-scheme: dark)", color: "#090A0C" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -72,11 +74,7 @@ const themeInitScript = `
 (function(){try{var t=localStorage.getItem('rexer-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';}}catch(e){}})();
 `;
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`dark ${font.variable}`} suppressHydrationWarning>
       <head>
@@ -84,12 +82,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground">
         <ThemeSync />
-        <Sidebar />
-        <div className="lg:pl-64">
-          <main id="main" className="min-h-screen pb-16 lg:pb-0">
-            {children}
-          </main>
-        </div>
+        <TopNav />
+        <main id="main" className="min-h-screen pb-16 pt-16 md:pb-0">
+          {children}
+        </main>
+        <SiteFooter />
         <BottomNav />
         <ServiceWorkerRegister />
       </body>

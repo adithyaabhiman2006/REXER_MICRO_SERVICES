@@ -28,7 +28,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-card/80 backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-2xl border border-white/10 bg-[#111315]/90 text-white shadow-2xl backdrop-blur-2xl md:hidden"
       aria-label="Mobile navigation"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
@@ -39,7 +39,7 @@ export function BottomNav() {
           aria-current={active ? "page" : undefined}
           className={cn(
             "flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors",
-            active ? "text-accent" : "text-muted-foreground",
+            active ? "text-rex-lime" : "text-white/55",
           )}
         >
           <Icon className="size-5" aria-hidden="true" />
@@ -51,7 +51,7 @@ export function BottomNav() {
         type="button"
         onClick={toggleTheme}
         aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-        className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-accent"
+        className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium text-white/55 transition-colors hover:text-rex-lime"
       >
         {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
         {theme === "dark" ? "Light" : "Dark"}
