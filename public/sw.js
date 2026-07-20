@@ -8,10 +8,14 @@
  * The build replaces __PUBLIC_PATH__ with the configured basePath so this
  * works both locally and under a subpath (e.g. GitHub Pages project site).
  */
-const PUBLIC_PATH = "__PUBLIC_PATH__";
-const VERSION = "rexer-v1";
+const INJECTED_PUBLIC_PATH = "__PUBLIC_PATH__";
+const PUBLIC_PATH = INJECTED_PUBLIC_PATH.startsWith("__") ? "" : INJECTED_PUBLIC_PATH;
+const VERSION = "rexer-v3";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
+const ROUTE_CACHE = `${VERSION}-routes`;
+const MAX_ROUTE_ENTRIES = 60;
+const MAX_ASSET_ENTRIES = 180;
 
 const SHELL_ASSETS = [
   `${PUBLIC_PATH}/`,
@@ -45,6 +49,39 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+async function trimCache(name, maxEntries) {
+  const cache = await caches.open(name);
+  const keys = await cache.keys();
+  await Promise.all(keys.slice(0, Math.max(0, keys.length - maxEntries)).map((key) => cache.delete(key)));
+}
+
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(ROUTE_CACHE);
+      await cache.put(request, response.clone());
+      await trimCache(ROUTE_CACHE, MAX_ROUTE_ENTRIES);
+    }
+    return response;
+  } catch {
+    return (await caches.match(request)) || (await caches.match(`${PUBLIC_PATH}/offline.html`));
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cached = await caches.match(request);
+  const update = fetch(request).then(async (response) => {
+    if (response.ok && (response.type === "basic" || response.type === "cors")) {
+      const cache = await caches.open(ASSET_CACHE);
+      await cache.put(request, response.clone());
+      await trimCache(ASSET_CACHE, MAX_ASSET_ENTRIES);
+    }
+    return response;
+  }).catch(() => cached);
+  return cached || update;
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
@@ -58,35 +95,17 @@ self.addEventListener("fetch", (event) => {
 
   // Navigations: network-first, fall back to cached shell / offline page.
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((resp) => {
-          const copy = resp.clone();
-          caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
-          return resp;
-        })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached || caches.match(`${PUBLIC_PATH}/offline.html`)),
-        ),
-    );
+    event.respondWith(networkFirst(request));
     return;
   }
 
   // Static assets: cache-first.
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
-        .then((resp) => {
-          if (resp && resp.status === 200 && resp.type === "basic") {
-            const copy = resp.clone();
-            caches.open(ASSET_CACHE).then((cache) => cache.put(request, copy));
-          }
-          return resp;
-        })
-        .catch(() => cached);
-    }),
-  );
+  event.respondWith(staleWhileRevalidate(request));
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "CLEAR_RUNTIME_CACHES") {
+    event.waitUntil(Promise.all([caches.delete(ASSET_CACHE), caches.delete(ROUTE_CACHE)]));
+  }
 });

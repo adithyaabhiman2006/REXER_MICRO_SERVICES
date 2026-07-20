@@ -1,0 +1,18 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#020617",
+    "sideBar.background": "#020617",
+    "editor.background": "#020617",
+    "panel.background": "#020617",
+    "statusBar.background": "#0057FF",
+    "titleBar.activeBackground": "#020617"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:twMerge|cn)\\(([^)]*)\\)", "[\\\"'`]([^\\\"'`]*)[\\\"'`]" ]
+  ]
+}

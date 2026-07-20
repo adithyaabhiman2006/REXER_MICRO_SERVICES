@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
-import { CATEGORY_GRADIENTS, CATEGORY_ICONS } from "@/lib/categories";
+import { CategoryGlyph } from "@/components/CategoryGlyph";
+import { CATEGORY_GRADIENTS } from "@/lib/categories";
 import { CATEGORIES } from "@/types/tools";
 import type { Tool, ToolCategory } from "@/types/tools";
 
@@ -23,7 +24,6 @@ const CATEGORY_LABEL: Record<ToolCategory, string> = Object.fromEntries(
  * Accessible tool card with category icon, gradient accent and hover motion.
  */
 export function ToolCard({ tool, index = 0 }: ToolCardProps) {
-  const Icon = CATEGORY_ICONS[tool.category];
   const gradient = CATEGORY_GRADIENTS[tool.category];
 
   return (
@@ -48,7 +48,7 @@ export function ToolCard({ tool, index = 0 }: ToolCardProps) {
             <span
               className={`flex size-9 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-sm`}
             >
-              <Icon className="size-5" strokeWidth={2} />
+              <CategoryGlyph category={tool.category} className="size-5" />
             </span>
             <ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
           </div>

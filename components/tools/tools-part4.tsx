@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- local blob and canvas previews */
 import { useEffect, useRef, useState } from "react";
 import { Download, Plus, Printer, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

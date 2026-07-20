@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- generated data URL preview */
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { Input } from "@/components/ui/input";

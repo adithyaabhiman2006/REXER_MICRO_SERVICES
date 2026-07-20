@@ -12,6 +12,16 @@ import * as P2 from "@/components/tools/tools-part2";
 import * as P3 from "@/components/tools/tools-part3";
 import * as P4 from "@/components/tools/tools-part4";
 import * as P5 from "@/components/tools/tools-part5";
+import * as P6 from "@/components/tools/tools-part6";
+const GifMaker = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.GifMaker));
+const ExifViewer = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.ExifViewer));
+const ImageMetadataEditor = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.ImageMetadataEditor));
+const PdfToWord = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.PdfToWord));
+const SmartImageLab = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.SmartImageLab));
+const SmartVideoGenerator = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.SmartVideoGenerator));
+const VoiceStyleStudio = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.VoiceStyleStudio));
+const SmartAudioStudio = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.SmartAudioStudio));
+const LipSyncStudio = dynamic(() => import("@/components/tools/tools-part7").then((module) => module.LipSyncStudio));
 
 const wrap = (Comp: ComponentType<any>, props: Record<string, any> = {}) => {
   const C = () => createElement(Comp, props);
@@ -20,6 +30,8 @@ const wrap = (Comp: ComponentType<any>, props: Record<string, any> = {}) => {
 };
 
 export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
+  "tiktok-ig-reels-downloader": wrap(P6.SocialMediaAssistant, { platform: "TikTok / Instagram" }),
+  "youtube-shorts-downloader": wrap(P6.SocialMediaAssistant, { platform: "YouTube Shorts" }),
   "password-generator": PasswordGenerator,
   "image-converter": ImageConverter,
   "whatsapp-dm-generator": WhatsAppGenerator,
@@ -106,9 +118,19 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "image-grayscale": P3.ImageGrayscale,
   "image-round-corners": P3.ImageRoundCorners,
   "image-to-base64": P3.ImageToBase64,
+  "base64-to-image": P6.Base64ToImage,
+  "image-collage": wrap(P6.ImageGridTool, { mode: "collage" }),
+  "gif-maker": GifMaker,
+  "image-combiner": wrap(P6.ImageGridTool, { mode: "combine" }),
+  "image-splitter": wrap(P6.ImageGridTool, { mode: "split" }),
+  "webp-converter": ImageConverter,
+  "exif-remover": ImageConverter,
+  "exif-viewer": ExifViewer,
+  "image-metadata-editor": ImageMetadataEditor,
   "color-picker-from-image": P3.ColorPickerFromImage,
   "png-to-jpg": P3.PngToJpg,
   "image-watermark": P3.ImageWatermark,
+  "image-text-overlay": P3.ImageWatermark,
   "meta-og-generator": P3.MetaOgGenerator,
   "robots-txt-generator": P3.RobotsTxtGenerator,
   "sitemap-generator": P3.SitemapGenerator,
@@ -119,6 +141,7 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "svg-to-png": P4.SvgToPng,
   "screen-recorder": P4.ScreenRecorder,
   "frame-grabber": P4.FrameGrabber,
+  "video-thumbnail": P4.FrameGrabber,
   "image-background-color": P4.ImageBackgroundColor,
   "css-gradient": P4.CssGradientGenerator,
   "css-shadow": P4.CssShadowGenerator,
@@ -135,10 +158,24 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "pdf-extract-text": P5.PdfExtractText,
   "markdown-to-html": P5.MarkdownToHtml,
   "text-diff": P5.TextDiff,
+  "diff-checker": P5.TextDiff,
+  "curl-to-code": P6.CurlToCode,
+  "json-to-zod": P6.JsonToZod,
+  "jsonl-viewer": P6.JsonLinesViewer,
+  "json-schema-builder": P6.JsonSchemaBuilder,
+  "chat-export-converter": P6.DataConverter,
+  "social-preview-checker": P6.SocialPreviewChecker,
   "heic-to-jpg": P5.HeicToJpg,
   "audio-converter": P5.AudioConverter,
   "audio-trimmer": P5.AudioTrimmer,
   "audio-reverse": P5.AudioReverse,
+  "gif-to-video": wrap(P5.FFmpegTool, { inputAccept: "image/gif", outputExt: "mp4", outputMime: "video/mp4", outputName: "animation.mp4", ffmpegLabel: "Convert GIF to MP4", ffmpegArgs: (i: string, o: string) => ["-i", i, "-movflags", "faststart", "-pix_fmt", "yuv420p", o] }),
+  "video-trimmer": wrap(P5.FFmpegTool, { inputAccept: "video/*", outputExt: "mp4", outputMime: "video/mp4", outputName: "trimmed.mp4", ffmpegLabel: "Trim first 30 seconds", ffmpegArgs: (i: string, o: string) => ["-i", i, "-t", "30", "-c:v", "libx264", "-c:a", "aac", o] }),
+  "video-resizer": wrap(P5.FFmpegTool, { inputAccept: "video/*", outputExt: "mp4", outputMime: "video/mp4", outputName: "resized.mp4", ffmpegLabel: "Resize to 1280px", ffmpegArgs: (i: string, o: string) => ["-i", i, "-vf", "scale=1280:-2", "-c:a", "copy", o] }),
+  "video-speed": wrap(P5.FFmpegTool, { inputAccept: "video/*", outputExt: "mp4", outputMime: "video/mp4", outputName: "speed-2x.mp4", ffmpegLabel: "Create 2× version", ffmpegArgs: (i: string, o: string) => ["-i", i, "-filter_complex", "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]", "-map", "[v]", "-map", "[a]", o] }),
+  "audio-compressor": wrap(P5.FFmpegTool, { inputAccept: "audio/*", outputExt: "mp3", outputMime: "audio/mpeg", outputName: "compressed.mp3", ffmpegLabel: "Compress audio", ffmpegArgs: (i: string, o: string) => ["-i", i, "-codec:a", "libmp3lame", "-b:a", "96k", o] }),
+  "audio-volume-booster": wrap(P5.FFmpegTool, { inputAccept: "audio/*", outputExt: "mp3", outputMime: "audio/mpeg", outputName: "boosted.mp3", ffmpegLabel: "Boost volume 2×", ffmpegArgs: (i: string, o: string) => ["-i", i, "-af", "volume=2", "-codec:a", "libmp3lame", o] }),
+  "audio-normalizer": wrap(P5.FFmpegTool, { inputAccept: "audio/*", outputExt: "mp3", outputMime: "audio/mpeg", outputName: "normalized.mp3", ffmpegLabel: "Normalize loudness", ffmpegArgs: (i: string, o: string) => ["-i", i, "-af", "loudnorm", "-codec:a", "libmp3lame", o] }),
   "video-converter": P5.VideoConverter,
   "video-compressor": P5.VideoCompressor,
   "video-mute": P5.VideoMute,
@@ -150,7 +187,56 @@ export const IMPLEMENTED_TOOLS: Record<string, ComponentType> = {
   "ai-email-writer": P5.AiEmailWriter,
   "ai-headline-generator": P5.AiHeadlineGenerator,
   "ai-translator": P5.AiTranslator,
+  "pdf-compress": wrap(P6.PdfWorkshop, { mode: "compress" }),
+  "pdf-sign": wrap(P6.PdfWorkshop, { mode: "sign" }),
+  "pdf-form-filler": wrap(P6.PdfWorkshop, { mode: "form" }),
+  "pdf-unlock": wrap(P6.PdfWorkshop, { mode: "unlock" }),
+  "pdf-header-footer": wrap(P6.PdfWorkshop, { mode: "header-footer" }),
+  "pdf-resize": wrap(P6.PdfWorkshop, { mode: "resize" }),
+  "pdf-to-word": PdfToWord,
+  "word-to-pdf": P6.TextToPdf,
+  "cv-builder": wrap(P6.TextToPdf, { cv: true }),
+  "csv-json-converter": P1.CsvToJson,
+  "bookkeeping": P4.MoneyManager,
+  "qr-code-scanner": P6.QrScanner,
+  "ai-blog-writer": wrap(P5.AITextWriter, { task: "Write a well-structured, useful blog post from this brief. Include a title and headings.", placeholder: "Topic, audience, tone, and key points…", label: "Write blog post" }),
+  "ai-caption-generator": wrap(P5.AITextWriter, { task: "Create 8 engaging social captions in varied tones, with restrained relevant hashtags.", placeholder: "Describe the post…", label: "Generate captions" }),
+  "ai-resume-writer": wrap(P5.AITextWriter, { task: "Turn these career notes into concise, achievement-focused resume content. Never invent facts.", placeholder: "Role, experience, outcomes, and skills…", label: "Draft resume" }),
+  "ai-product-description": wrap(P5.AITextWriter, { task: "Write a clear, persuasive product description using only the supplied facts.", placeholder: "Product facts and audience…", label: "Write description" }),
+  "ai-tweet-generator": wrap(P5.AITextWriter, { task: "Write 5 concise social posts under 280 characters. Avoid clickbait.", placeholder: "Topic and voice…", label: "Generate posts" }),
+  "ai-image-generator": wrap(P6.AiImageStudio, { style: "cinematic editorial" }),
+  "ai-background-remover": wrap(SmartImageLab, { mode: "background" }),
+  "ai-image-enhancer": wrap(SmartImageLab, { mode: "enhance" }),
+  "ai-retouch": wrap(SmartImageLab, { mode: "retouch" }),
+  "ai-colorize": wrap(SmartImageLab, { mode: "colorize" }),
+  "ai-object-remover": wrap(SmartImageLab, { mode: "remove" }),
+  "ai-logo-generator": wrap(P6.AiImageStudio, { style: "minimal vector logo on a plain background" }),
+  "ai-thumbnail-generator": wrap(P6.AiImageStudio, { style: "high-impact video thumbnail with clear visual hierarchy" }),
+  "ai-sketch-to-image": wrap(P6.AiImageStudio, { style: "concept art derived from a sketch description" }),
+  "ai-profile-pic": wrap(P6.AiImageStudio, { style: "professional profile portrait" }),
+  "ai-video-generator": SmartVideoGenerator,
+  "ai-subtitle-generator": wrap(P5.AITextWriter, { task: "Convert this transcript into concise SRT subtitles with sensible timing placeholders.", placeholder: "Paste a transcript…", label: "Create subtitles" }),
+  "ai-voice-generator": P6.VoiceGenerator,
+  "ai-voice-clone": VoiceStyleStudio,
+  "ai-noise-removal": SmartAudioStudio,
+  "ai-podcast-editor": wrap(SmartAudioStudio, { podcast: true }),
+  "ai-speech-to-text": P6.SpeechToText,
+  "ai-video-summarizer": wrap(P5.AITextWriter, { task: "Summarize this video transcript into key points, decisions, and action items.", placeholder: "Paste a transcript…", label: "Summarize" }),
+  "ai-code-generator": wrap(P5.AITextWriter, { task: "Generate clean, secure code for this request. State the language and important assumptions.", placeholder: "Describe what to build…", label: "Generate code" }),
+  "ai-debugger": wrap(P5.AITextWriter, { task: "Diagnose this code and error. Explain the root cause, then provide a minimal corrected version.", placeholder: "Paste code and the exact error…", label: "Debug" }),
+  "ai-regex-generator": wrap(P5.AITextWriter, { task: "Generate a safe regular expression for this requirement, with test examples and flags.", placeholder: "Describe what should match…", label: "Generate regex" }),
+  "ai-sql-generator": wrap(P5.AITextWriter, { task: "Generate parameterized SQL for this requirement. Explain the expected schema assumptions.", placeholder: "Describe the query and tables…", label: "Generate SQL" }),
+  "ai-json-fixer": wrap(P5.AITextWriter, { task: "Repair this malformed JSON. Return only valid JSON without markdown fences.", placeholder: "Paste malformed JSON…", label: "Fix JSON" }),
+  "ai-mock-api": wrap(P5.AITextWriter, { task: "Design a concise mock REST API: resources, routes, example requests, and JSON responses.", placeholder: "Describe the product domain…", label: "Design mock API" }),
+  "ai-chatbot-builder": wrap(P5.AITextWriter, { task: "Create a production-ready chatbot system prompt with role, boundaries, workflow, and fallback behavior.", placeholder: "Describe the chatbot…", label: "Build prompt" }),
+  "ai-prompt-generator": wrap(P5.AITextWriter, { task: "Transform this goal into a precise reusable AI prompt with context, constraints, and output format.", placeholder: "What should the AI accomplish?", label: "Generate prompt" }),
+  "ai-document-summarizer": wrap(P5.AITextWriter, { task: "Summarize this document faithfully. Separate main points, evidence, risks, and actions.", placeholder: "Paste document text…", label: "Summarize document" }),
+  "ai-pdf-chat": wrap(P5.AITextWriter, { task: "Answer the question using only the pasted PDF text. If unsupported, say so clearly.", placeholder: "Paste PDF text, then your question…", label: "Ask document" }),
+  "ai-lip-sync": LipSyncStudio,
 };
 
-export const SOCIAL_DOWNLOADERS: Record<string, string> = {};
+export const SOCIAL_DOWNLOADERS: Record<string, string> = {
+  "tiktok-ig-reels-downloader": "TikTok / Instagram",
+  "youtube-shorts-downloader": "YouTube Shorts",
+};
 export const IMPLEMENTED_SLUGS = new Set(Object.keys(IMPLEMENTED_TOOLS));

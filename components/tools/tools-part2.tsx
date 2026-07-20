@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element, react-hooks/exhaustive-deps -- local blob previews and timer lifecycle */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

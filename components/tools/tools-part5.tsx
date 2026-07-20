@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element, react-hooks/exhaustive-deps -- local outputs and intentionally debounced processors */
 import { useEffect, useRef, useState } from "react";
 import { Download, Loader2, UploadCloud, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -172,7 +173,7 @@ export function HeicToJpg() {
   return (<div className="space-y-4"><FilePicker files={file ? [file] : []} onFiles={(f) => { setFile(f[0] || null); setUrl(""); }} accept="image/heic,image/heif,.heic,.heif" multiple={false} />{busy && <Busy msg="Converting HEIC…" />}{err && <p className="text-sm text-red-400">{err}</p>}{file && !busy && <Button variant="gradient" className="w-full" onClick={go}>Convert to JPG</Button>}{url && <div className="space-y-2"><div className="flex justify-center rounded-lg bg-white p-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={url} alt="result" className="max-h-64 object-contain" /></div><Button asChild variant="outline" className="w-full"><a href={url} download="converted.jpg"><Download className="size-4" />Download</a></Button></div>}</div>);
 }
 
-function FFmpegTool({ inputAccept, outputExt, outputMime, ffmpegArgs, outputName, ffmpegLabel }: { inputAccept: string; outputExt: string; outputMime: string; ffmpegArgs: (inName: string, outName: string) => string[]; outputName: string; ffmpegLabel: string }) {
+export function FFmpegTool({ inputAccept, outputExt, outputMime, ffmpegArgs, outputName, ffmpegLabel }: { inputAccept: string; outputExt: string; outputMime: string; ffmpegArgs: (inName: string, outName: string) => string[]; outputName: string; ffmpegLabel: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -235,7 +236,7 @@ async function aiGenerate(systemTask: string, userInput: string, signal?: AbortS
   return txt.trim();
 }
 
-function AITextWriter({ task, placeholder, label }: { task: string; placeholder: string; label: string }) {
+export function AITextWriter({ task, placeholder, label }: { task: string; placeholder: string; label: string }) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
