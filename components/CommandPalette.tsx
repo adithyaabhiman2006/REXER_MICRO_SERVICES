@@ -75,15 +75,15 @@ export function CommandPalette() {
 
   const openTool = (slug: string) => {
     rememberTool(slug);
-    setOpen(false);
     router.push(`/tools/${slug}`);
+    setOpen(false);
   };
 
   const openCategory = (category: string) => {
     setActiveCategory(category);
     setSearchQuery("");
-    setOpen(false);
     router.push("/#tools-heading");
+    setOpen(false);
     window.setTimeout(() => document.getElementById("tools-heading")?.scrollIntoView(), 120);
   };
 
@@ -118,7 +118,13 @@ export function CommandPalette() {
                 event.preventDefault();
                 setSelected((value) => Math.max(value - 1, 0));
               }
-              if (event.key === "Enter" && results[selected]) openTool(results[selected].slug);
+              if (event.key === "Enter") {
+                const liveResults = event.currentTarget.value.trim()
+                  ? searchTools(event.currentTarget.value, tools).slice(0, 8)
+                  : results;
+                const activeIndex = Math.min(selected, Math.max(liveResults.length - 1, 0));
+                if (liveResults[activeIndex]) openTool(liveResults[activeIndex].slug);
+              }
             }}
             placeholder="What do you need to do?"
             aria-label="Search all 200 tools"
