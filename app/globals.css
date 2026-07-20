@@ -95,6 +95,10 @@
   .hero-stage {
     transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
+  .hero-art {
+    transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+  }
 
   @keyframes card-float {
     0%,

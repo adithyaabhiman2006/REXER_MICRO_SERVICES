@@ -20,10 +20,10 @@ export function TopNav() {
   const toggleTheme = useAppStore((state) => state.toggleTheme);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-background/75 backdrop-blur-2xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#090a0c]/85 text-white backdrop-blur-2xl">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
         <Link href="/" className="group flex items-center gap-3" aria-label="Rexer home">
-          <span className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-foreground text-background">
+          <span className="relative grid size-9 place-items-center overflow-hidden rounded-full bg-white text-black">
             <span className="text-sm font-black tracking-[-0.12em]">RX</span>
             <span className="absolute inset-0 translate-y-full bg-rex-lime transition-transform duration-300 group-hover:translate-y-0" />
             <span className="absolute z-10 text-sm font-black tracking-[-0.12em] opacity-0 transition-opacity duration-300 group-hover:text-black group-hover:opacity-100">
@@ -32,7 +32,7 @@ export function TopNav() {
           </span>
           <span className="leading-none">
             <span className="block text-sm font-black tracking-[-0.04em]">REXER</span>
-            <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
+            <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.28em] text-white/40">
               Digital utility lab
             </span>
           </span>
@@ -44,8 +44,8 @@ export function TopNav() {
               key={link.label}
               href={link.href}
               className={cn(
-                "rounded-full px-4 py-2 text-xs font-semibold transition-colors hover:bg-foreground hover:text-background",
-                pathname === link.href ? "bg-foreground text-background" : "text-muted-foreground",
+                "rounded-full px-4 py-2 text-xs font-semibold transition-colors hover:bg-white hover:text-black",
+                pathname === link.href ? "bg-white text-black" : "text-white/55",
               )}
             >
               {link.label}
@@ -56,15 +56,17 @@ export function TopNav() {
         <div className="flex items-center gap-2">
           <Link
             href="/#tool-search"
-            className="hidden h-10 items-center gap-2 rounded-full border border-border bg-card px-4 text-xs font-semibold text-muted-foreground transition-all hover:border-foreground/30 hover:text-foreground sm:flex"
+            className="hidden h-10 items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-semibold text-white/55 transition-all hover:border-white/35 hover:text-white sm:flex"
           >
             <Search className="size-3.5" /> Find a tool{" "}
-            <kbd className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px]">/</kbd>
+            <kbd className="rounded border border-white/15 px-1.5 py-0.5 font-mono text-[9px]">
+              /
+            </kbd>
           </Link>
           <button
             type="button"
             onClick={toggleTheme}
-            className="grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-all hover:rotate-12 hover:border-foreground/30 hover:text-foreground"
+            className="grid size-10 place-items-center rounded-full border border-white/15 bg-white/5 text-white/55 transition-all hover:rotate-12 hover:border-white/35 hover:text-white"
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
           >
             {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
