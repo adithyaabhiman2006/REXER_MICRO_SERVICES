@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CopyButton, OutputField } from "@/components/tools/_shared";
-import { loadCDN, esm } from "@/lib/cdn";
+import { loadCDN, esm, loadScript, waitForGlobal } from "@/lib/cdn";
 
 export function FilePicker({ files, onFiles, accept, multiple = true }: { files: File[]; onFiles: (f: File[]) => void; accept: string; multiple?: boolean }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -26,20 +26,28 @@ export function FilePicker({ files, onFiles, accept, multiple = true }: { files:
   );
 }
 
-let ffmpegPromise: Promise<any> | null = null;
-async function loadFFmpeg(): Promise<any> {
+function Busy({ msg }: { msg: string }) { return <p className="flex items-center justify-center gap-2 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent"><Loader2 className="size-4 animate-spin" />{msg}</p>; }
+
+let ffmpegPromise: Promise<{ ffmpeg: any; fetchFile: any }> | null = null;
+async function loadFFmpeg(): Promise<{ ffmpeg: any; fetchFile: any }> {
   if (ffmpegPromise) return ffmpegPromise;
   ffmpegPromise = (async () => {
-    const { FFmpeg } = await loadCDN(esm("@ffmpeg/ffmpeg", "0.12.10"));
-    const { fetchFile } = await loadCDN(esm("@ffmpeg/util", "0.12.1"));
+    await loadScript("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js");
+    await loadScript("https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js");
+    const FFmpegWASM: any = await waitForGlobal("FFmpegWASM");
+    const FFmpegUtil: any = await waitForGlobal("FFmpegUtil");
+    const { FFmpeg } = FFmpegWASM;
+    const { fetchFile, toBlobURL } = FFmpegUtil;
     const ffmpeg = new FFmpeg();
-    await ffmpeg.load({ coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js", wasmURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm" });
+    const coreBase = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm"),
+    });
     return { ffmpeg, fetchFile };
   })();
   return ffmpegPromise;
 }
-
-function Busy({ msg }: { msg: string }) { return <p className="flex items-center justify-center gap-2 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent"><Loader2 className="size-4 animate-spin" />{msg}</p>; }
 
 export function PdfMerge() {
   const [files, setFiles] = useState<File[]>([]);
@@ -54,8 +62,8 @@ export function PdfMerge() {
       const out = await PDFDocument.create();
       for (const f of files) { const src = await PDFDocument.load(await f.arrayBuffer()); const pages = await out.copyPages(src, src.getPageIndices()); pages.forEach((p: any) => out.addPage(p)); }
       const bytes = await out.save();
-      setUrl(URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })));
-    } catch (e) { setErr("Merge failed."); } finally { setBusy(false); }
+      setUrl(URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" })));
+    } catch (e) { setErr("Merge failed: " + (e instanceof Error ? e.message : "unknown")); } finally { setBusy(false); }
   }
   return (<div className="space-y-4"><FilePicker files={files} onFiles={(f) => { setFiles(f); setUrl(""); }} accept="application/pdf" />{busy && <Busy msg="Merging PDFs…" />}{err && <p className="text-sm text-red-400">{err}</p>}{files.length >= 2 && !busy && <Button variant="gradient" className="w-full" onClick={merge}>Merge {files.length} PDFs</Button>}{url && <Button asChild variant="outline" className="w-full"><a href={url} download="merged.pdf"><Download className="size-4" />Download merged.pdf</a></Button>}<p className="text-xs text-muted-foreground">Combined locally via pdf-lib. First use loads it from CDN.</p></div>);
 }
@@ -72,7 +80,7 @@ export function PdfSplit() {
       const { PDFDocument } = await loadCDN(esm("pdf-lib", "1.17.1"));
       const src = await PDFDocument.load(await file.arrayBuffer());
       const out: { name: string; url: string }[] = [];
-      for (let i = 0; i < src.getPageCount(); i++) { const doc = await PDFDocument.create(); const [page] = await doc.copyPages(src, [i]); doc.addPage(page); const bytes = await doc.save(); out.push({ name: `${file.name.replace(/\.pdf$/i, "")}-page-${i + 1}.pdf`, url: URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })) }); }
+      for (let i = 0; i < src.getPageCount(); i++) { const doc = await PDFDocument.create(); const [page] = await doc.copyPages(src, [i]); doc.addPage(page); const bytes = await doc.save(); out.push({ name: `${file.name.replace(/\.pdf$/i, "")}-page-${i + 1}.pdf`, url: URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" })) }); }
       setUrls(out);
     } catch (e) { setErr("Split failed."); } finally { setBusy(false); }
   }
@@ -94,7 +102,7 @@ export function PdfWatermark() {
       const font = await doc.embedFont(lib.StandardFonts.HelveticaBold);
       for (const page of doc.getPages()) { const { width, height } = page.getSize(); const size = 48; const w = font.widthOfTextAtSize(text, size); page.drawText(text, { x: width / 2 - w / 2, y: height / 2, size, font, color: lib.rgb(0.5, 0.5, 0.5), opacity: 0.3, rotate: lib.degrees(45) }); }
       const bytes = await doc.save();
-      setUrl(URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })));
+      setUrl(URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" })));
     } catch (e) { setErr("Watermark failed."); } finally { setBusy(false); }
   }
   return (<div className="space-y-4"><FilePicker files={file ? [file] : []} onFiles={(f) => { setFile(f[0] || null); setUrl(""); }} accept="application/pdf" multiple={false} /><div className="space-y-1.5"><Label>Watermark text</Label><Input value={text} onChange={(e) => setText(e.target.value)} /></div>{busy && <Busy msg="Stamping…" />}{err && <p className="text-sm text-red-400">{err}</p>}{file && !busy && <Button variant="gradient" className="w-full" onClick={stamp}>Add watermark</Button>}{url && <Button asChild variant="outline" className="w-full"><a href={url} download="watermarked.pdf"><Download className="size-4" />Download</a></Button>}</div>);
@@ -167,22 +175,27 @@ function FFmpegTool({ inputAccept, outputExt, outputMime, ffmpegArgs, outputName
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [stage, setStage] = useState("");
   const [err, setErr] = useState("");
   async function go() {
     if (!file) return;
-    setBusy(true); setErr(""); setProgress(0);
+    setBusy(true); setErr(""); setProgress(0); setUrl(""); setStage("Loading ffmpeg engine (~30MB first use)…");
     try {
       const { ffmpeg, fetchFile } = await loadFFmpeg();
-      const inName = "in" + (file.name.match(/\.[^.]+$/)?.[0] || "");
+      const inName = "in" + (file.name.match(/\.[^.]+$/)?.[0] || ".mp4");
       const outName = "out." + outputExt;
-      ffmpeg.on("progress", ({ progress }: any) => setProgress(Math.round(progress * 100)));
+      const onProg = ({ progress: p }: any) => { if (p && p > 0) setProgress(Math.round(p * 100)); setStage("Processing…"); };
+      ffmpeg.on("progress", onProg);
       await ffmpeg.writeFile(inName, await fetchFile(file));
       await ffmpeg.exec(ffmpegArgs(inName, outName));
+      ffmpeg.off("progress", onProg);
       const data = await ffmpeg.readFile(outName);
-      setUrl(URL.createObjectURL(new Blob([data], { type: outputMime })));
-    } catch (e) { setErr("Processing failed. First use downloads ~30MB of ffmpeg engine."); } finally { setBusy(false); }
+      setUrl(URL.createObjectURL(new Blob([data as BlobPart], { type: outputMime })));
+    } catch (e) {
+      setErr("Processing failed: " + (e instanceof Error ? e.message : "unknown") + ". The ffmpeg engine (~30MB) loads on first use — check your connection and try again.");
+    } finally { setBusy(false); setStage(""); }
   }
-  return (<div className="space-y-4"><FilePicker files={file ? [file] : []} onFiles={(f) => { setFile(f[0] || null); setUrl(""); }} accept={inputAccept} multiple={false} />{busy && <div className="space-y-1"><Busy msg={`${ffmpegLabel}… ${progress}%`} />{progress > 0 && <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted"><div className="h-full bg-gradient-accent transition-all" style={{ width: `${progress}%` }} /></div>}</div>}{err && <p className="text-sm text-red-400">{err}</p>}{file && !busy && <Button variant="gradient" className="w-full" onClick={go}>{ffmpegLabel}</Button>}{url && <div className="space-y-2">{outputMime.startsWith("video") ? <video src={url} controls className="w-full rounded-md border border-border" /> : outputMime.startsWith("audio") ? <audio src={url} controls className="w-full" /> : <div className="flex justify-center rounded-lg bg-white p-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={url} alt="result" className="max-h-64 object-contain" /></div>}<Button asChild variant="outline" className="w-full"><a href={url} download={outputName}><Download className="size-4" />Download {outputName}</a></Button></div>}<p className="text-xs text-muted-foreground">First use downloads ffmpeg (~30MB); subsequent uses are instant. All processing is local.</p></div>);
+  return (<div className="space-y-4"><FilePicker files={file ? [file] : []} onFiles={(f) => { setFile(f[0] || null); setUrl(""); }} accept={inputAccept} multiple={false} />{busy && <div className="space-y-1"><Busy msg={stage || "Working…"} />{progress > 0 && <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted"><div className="h-full bg-gradient-accent transition-all" style={{ width: `${progress}%` }} /></div>}</div>}{err && <p className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-400">{err}</p>}{file && !busy && <Button variant="gradient" className="w-full" onClick={go}>{ffmpegLabel}</Button>}{url && <div className="space-y-2">{outputMime.startsWith("video") ? <video src={url} controls className="w-full rounded-md border border-border" /> : outputMime.startsWith("audio") ? <audio src={url} controls className="w-full" /> : <div className="flex justify-center rounded-lg bg-white p-3">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={url} alt="result" className="max-h-64 object-contain" /></div>}<Button asChild variant="outline" className="w-full"><a href={url} download={outputName}><Download className="size-4" />Download {outputName}</a></Button></div>}<p className="text-xs text-muted-foreground">First use downloads the ffmpeg engine (~30MB) and caches it. All processing happens locally in your browser — nothing is uploaded.</p></div>);
 }
 
 export const AudioConverter = () => <FFmpegTool inputAccept="audio/*" outputExt="mp3" outputMime="audio/mpeg" outputName="converted.mp3" ffmpegLabel="Convert to MP3" ffmpegArgs={(i, o) => ["-i", i, "-codec:a", "libmp3lame", "-qscale:a", "2", o]} />;
@@ -194,32 +207,55 @@ export const VideoToAudio = () => <FFmpegTool inputAccept="video/*" outputExt="m
 export const VideoToGif = () => <FFmpegTool inputAccept="video/*" outputExt="gif" outputMime="image/gif" outputName="animation.gif" ffmpegLabel="Create GIF" ffmpegArgs={(i, o) => ["-i", i, "-vf", "fps=10,scale=480:-1", o]} />;
 export const AudioReverse = () => <FFmpegTool inputAccept="audio/*" outputExt="mp3" outputMime="audio/mpeg" outputName="reversed.mp3" ffmpegLabel="Reverse audio" ffmpegArgs={(i, o) => ["-i", i, "-map", "0:a", "-af", "areverse", "-codec:a", "libmp3lame", o]} />;
 
+async function aiGenerate(systemTask: string, userInput: string, signal?: AbortSignal): Promise<string> {
+  const fullPrompt = `${systemTask}\n\n--- INPUT ---\n${userInput}\n\n--- OUTPUT ---`;
+  try {
+    const res = await fetch("https://text.pollinations.ai/openai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal,
+      body: JSON.stringify({
+        model: "openai",
+        messages: [
+          { role: "system", content: "You are a helpful writing assistant. Be concise and follow instructions exactly." },
+          { role: "user", content: fullPrompt },
+        ],
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const txt = data?.choices?.[0]?.message?.content;
+      if (txt) return txt.trim();
+    }
+  } catch { /* fall through to GET */ }
+  const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(fullPrompt)}?model=openai`, { signal });
+  const txt = await res.text();
+  return txt.trim();
+}
+
 function AITextWriter({ task, placeholder, label }: { task: string; placeholder: string; label: string }) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("");
   const [err, setErr] = useState("");
-  const engineRef = useRef<any>(null);
+  const abortRef = useRef<AbortController | null>(null);
   async function run() {
     if (!input.trim()) return;
-    setBusy(true); setErr(""); setOutput(""); setStatus("Loading AI model (first run downloads ~2GB)…");
+    setBusy(true); setErr(""); setOutput("");
+    const ac = new AbortController(); abortRef.current = ac;
     try {
-      if (!engineRef.current) {
-        const { CreateMLCEngine } = await loadCDN(esm("@mlc-ai/web-llm", "0.2.62"));
-        engineRef.current = await CreateMLCEngine("Llama-3.2-1B-Instruct-q4f32_1-MLC", { initProgressCallback: (p: any) => setStatus(p.text || "Loading…") });
-      }
-      setStatus("Generating…");
-      const reply = await engineRef.current.chat.completions.create({ messages: [{ role: "user", content: `${task}\n\nINPUT:\n${input}\n\nOUTPUT:` }], temperature: 0.7, max_tokens: 400 });
-      setOutput(reply.choices[0]?.message?.content || "(no output)");
-    } catch (e) { setErr("AI needs WebGPU (Chrome/Edge desktop). Try a different browser, or the model download failed."); } finally { setBusy(false); setStatus(""); }
+      const out = await aiGenerate(task, input, ac.signal);
+      setOutput(out || "(no output)");
+    } catch (e) {
+      setErr("The AI service didn't respond. Please try again in a moment. (" + (e instanceof Error ? e.message : "network") + ")");
+    } finally { setBusy(false); abortRef.current = null; }
   }
-  return (<div className="space-y-4"><Textarea rows={6} value={input} onChange={(e) => setInput(e.target.value)} placeholder={placeholder} /><Button variant="gradient" onClick={run} disabled={busy || !input.trim()}>{busy ? "Working…" : label}</Button>{status && <Busy msg={status} />}{err && <p className="rounded-md bg-amber-500/10 px-3 py-2 text-sm text-amber-400">{err}</p>}{output && <OutputField value={output} rows={8} />}<p className="text-xs text-muted-foreground">Runs a real AI model (Llama 3.2) entirely in your browser via WebGPU — nothing uploaded. First run downloads ~2GB, then cached. Needs Chrome/Edge desktop.</p></div>);
+  return (<div className="space-y-4"><Textarea rows={6} value={input} onChange={(e) => setInput(e.target.value)} placeholder={placeholder} /><Button variant="gradient" onClick={run} disabled={busy || !input.trim()}>{busy ? "Generating…" : label}</Button>{busy && <Busy msg="Thinking…" />}{err && <p className="rounded-md bg-amber-500/10 px-3 py-2 text-sm text-amber-400">{err}</p>}{output && <OutputField value={output} rows={8} />}<p className="text-xs text-muted-foreground">Powered by a free cloud AI (GPT-OSS). Works on every device. Your text is sent to generate a response but is not stored.</p></div>);
 }
 
-export const AiTextRewriter = () => <AITextWriter task="Rewrite the following text clearly and naturally. Keep the meaning." placeholder="Paste text to rewrite…" label="Rewrite" />;
-export const AiParaphraser = () => <AITextWriter task="Paraphrase the following text keeping the meaning." placeholder="Paste text to paraphrase…" label="Paraphrase" />;
-export const AiGrammarChecker = () => <AITextWriter task="Fix grammar and spelling. Output only the corrected version." placeholder="Paste text to check…" label="Fix grammar" />;
-export const AiEmailWriter = () => <AITextWriter task="Write a professional, friendly email from these notes. Include a subject line." placeholder="e.g. meeting Tuesday, need Q3 report, polite reminder" label="Write email" />;
-export const AiHeadlineGenerator = () => <AITextWriter task="Generate 5 catchy headlines for this topic, one per line." placeholder="Describe your topic…" label="Generate headlines" />;
-export const AiTranslator = () => <AITextWriter task="Translate the following text to English unless another language is specified." placeholder="Paste text to translate…" label="Translate" />;
+export const AiTextRewriter = () => <AITextWriter task="Rewrite the following text clearly and naturally. Keep the meaning but improve flow." placeholder="Paste text to rewrite…" label="Rewrite" />;
+export const AiParaphraser = () => <AITextWriter task="Paraphrase the following text, keeping the meaning but using different wording." placeholder="Paste text to paraphrase…" label="Paraphrase" />;
+export const AiGrammarChecker = () => <AITextWriter task="Fix grammar and spelling in the following text. Output ONLY the corrected version, nothing else." placeholder="Paste text to check…" label="Fix grammar" />;
+export const AiEmailWriter = () => <AITextWriter task="Write a professional, friendly email based on these notes. Start with a subject line." placeholder="e.g. meeting Tuesday, need Q3 report, polite reminder" label="Write email" />;
+export const AiHeadlineGenerator = () => <AITextWriter task="Generate 5 catchy headlines for this topic, one per line, numbered 1-5." placeholder="Describe your topic or content…" label="Generate headlines" />;
+export const AiTranslator = () => <AITextWriter task="Translate the following text. Detect the language and translate to English unless the text specifies another target language." placeholder="Paste text to translate…" label="Translate" />;
