@@ -4,6 +4,7 @@ import { CampaignHero } from "@/components/CampaignHero";
 import { FeaturedTools } from "@/components/FeaturedTools";
 import { IntentLauncher } from "@/components/IntentLauncher";
 import { ToolExplorer } from "@/components/ToolExplorer";
+import { LiveDesk } from "@/components/LiveDesk";
 
 export default function HomePage() {
   return (
@@ -69,6 +70,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <LiveDesk />
       <IntentLauncher />
       <FeaturedTools />
 

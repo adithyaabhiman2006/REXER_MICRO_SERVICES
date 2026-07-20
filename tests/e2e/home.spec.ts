@@ -30,3 +30,13 @@ test("intent launcher narrows tools by user goal", async ({ page }) => {
   await expect(page.getByRole("searchbox", { name: "Search tools" })).toHaveValue("pdf");
   await expect(page.getByRole("link", { name: "Open PDF Merge" })).toBeVisible();
 });
+
+test("live desk keeps a private note across reloads", async ({ page }) => {
+  await page.goto("/");
+  const note = page.getByRole("textbox", { name: "Local desk note" });
+  await note.fill("Finish the Rexer launch");
+  await page.reload();
+  await expect(page.getByRole("textbox", { name: "Local desk note" })).toHaveValue(
+    "Finish the Rexer launch",
+  );
+});

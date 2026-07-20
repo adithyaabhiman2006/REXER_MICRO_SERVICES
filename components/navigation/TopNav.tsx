@@ -9,7 +9,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 const links = [
   { href: "/#tools-heading", label: "All tools" },
-  { href: "/tools/image-converter", label: "Media lab" },
+  { href: "/#desk", label: "Live desk" },
   { href: "/tools/pdf-merge", label: "PDF suite" },
   { href: "/tools/ai-text-rewriter", label: "AI studio" },
 ];
