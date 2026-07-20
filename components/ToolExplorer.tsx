@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, Search, SlidersHorizontal, X } from "lucide-react";
 
 import { CategoryGlyph } from "@/components/CategoryGlyph";
@@ -19,7 +19,6 @@ export function ToolExplorer() {
   const activeCategory = useAppStore((state) => state.activeCategory);
   const setActiveCategory = useAppStore((state) => state.setActiveCategory);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     const source =
@@ -29,19 +28,6 @@ export function ToolExplorer() {
   const visible = filtered.slice(0, visibleCount);
 
   useEffect(() => setVisibleCount(PAGE_SIZE), [searchQuery, activeCategory]);
-  useEffect(() => {
-    const focusSearch = (event: KeyboardEvent) => {
-      if (
-        event.key === "/" &&
-        !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName)
-      ) {
-        event.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", focusSearch);
-    return () => window.removeEventListener("keydown", focusSearch);
-  }, []);
 
   return (
     <section
@@ -74,7 +60,6 @@ export function ToolExplorer() {
           <div id="tool-search" className="group relative flex-1 scroll-mt-36">
             <Search className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-rex-lime" />
             <input
-              ref={searchRef}
               type="search"
               inputMode="search"
               value={searchQuery}

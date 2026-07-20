@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 import { CategoryGlyph } from "@/components/CategoryGlyph";
+import { rememberTool } from "@/lib/recent-tools";
 import type { Tool, ToolCategory } from "@/types/tools";
 import { CATEGORIES } from "@/types/tools";
 
@@ -32,6 +33,7 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
     >
       <Link
         href={`/tools/${tool.slug}`}
+        onClick={() => rememberTool(tool.slug)}
         aria-label={`Open ${tool.title}`}
         className="group flex h-full min-h-[290px] flex-col p-5 transition-colors hover:bg-card sm:p-6"
       >

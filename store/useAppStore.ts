@@ -31,12 +31,15 @@ interface AppState {
   theme: Theme;
   /** True once the theme has been hydrated from storage/system. */
   themeReady: boolean;
+  /** Global tool launcher visibility. */
+  commandOpen: boolean;
 
   setSearchQuery: (query: string) => void;
   setActiveCategory: (category: ToolCategoryFilter) => void;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   initTheme: () => void;
+  setCommandOpen: (open: boolean) => void;
 }
 
 function persistTheme(theme: Theme) {
@@ -53,6 +56,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeCategory: "all",
   theme: "dark",
   themeReady: false,
+  commandOpen: false,
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setActiveCategory: (activeCategory) => set({ activeCategory }),
@@ -69,4 +73,5 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (get().themeReady) return;
     set({ theme: resolveInitialTheme(), themeReady: true });
   },
+  setCommandOpen: (commandOpen) => set({ commandOpen }),
 }));

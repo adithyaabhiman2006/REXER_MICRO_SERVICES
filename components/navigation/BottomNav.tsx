@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, Moon, Sun } from "lucide-react";
+import { Home, LayoutGrid, Moon, Search, Sun } from "lucide-react";
 
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const theme = useAppStore((s) => s.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
+  const setCommandOpen = useAppStore((s) => s.setCommandOpen);
 
   const items = [
     { href: "/", label: "Home", icon: Home, active: pathname === "/" },
@@ -46,6 +47,16 @@ export function BottomNav() {
           {label}
         </Link>
       ))}
+
+      <button
+        type="button"
+        onClick={() => setCommandOpen(true)}
+        aria-label="Find a tool"
+        className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium text-white/55 transition-colors hover:text-rex-lime"
+      >
+        <Search className="size-5" />
+        Search
+      </button>
 
       <button
         type="button"

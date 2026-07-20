@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowDownRight, ArrowRight, Check, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { ArrowDownRight, Check, ShieldCheck, Sparkles, Zap } from "lucide-react";
 
 import { HeroStage } from "@/components/HeroStage";
 import { FeaturedTools } from "@/components/FeaturedTools";
 import { ToolExplorer } from "@/components/ToolExplorer";
+import { IntentLauncher } from "@/components/IntentLauncher";
+import { CommandTrigger } from "@/components/CommandTrigger";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
@@ -52,16 +54,7 @@ export default function HomePage() {
                   Explore all tools <ArrowDownRight className="size-4" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="h-14 rounded-full border-white/25 px-7 text-sm font-bold text-white hover:bg-white/10 hover:text-white"
-              >
-                <Link href="/tools/image-converter">
-                  Open image lab <ArrowRight className="size-4" />
-                </Link>
-              </Button>
+              <CommandTrigger />
             </div>
 
             <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-[11px] font-bold uppercase tracking-[.12em] text-white/45">
@@ -149,6 +142,7 @@ export default function HomePage() {
         ))}
       </section>
 
+      <IntentLauncher />
       <FeaturedTools />
       <ToolExplorer />
     </>

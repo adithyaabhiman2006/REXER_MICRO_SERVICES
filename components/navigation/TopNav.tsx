@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Moon, Search, Sun } from "lucide-react";
+import { ArrowUpRight, Command, Moon, Search, Sun } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -18,6 +18,7 @@ export function TopNav() {
   const pathname = usePathname();
   const theme = useAppStore((state) => state.theme);
   const toggleTheme = useAppStore((state) => state.toggleTheme);
+  const setCommandOpen = useAppStore((state) => state.setCommandOpen);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#090a0c]/85 text-white backdrop-blur-2xl">
@@ -54,15 +55,16 @@ export function TopNav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/#tool-search"
+          <button
+            type="button"
+            onClick={() => setCommandOpen(true)}
             className="hidden h-10 items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 text-xs font-semibold text-white/55 transition-all hover:border-white/35 hover:text-white sm:flex"
           >
             <Search className="size-3.5" /> Find a tool{" "}
             <kbd className="rounded border border-white/15 px-1.5 py-0.5 font-mono text-[9px]">
-              /
+              <Command className="mr-0.5 inline size-2.5" />K
             </kbd>
-          </Link>
+          </button>
           <button
             type="button"
             onClick={toggleTheme}
