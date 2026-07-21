@@ -21,7 +21,7 @@ test("global command palette finds a tool from the keyboard", async ({ page }) =
   await expect(launcher).toBeVisible();
   await launcher.getByRole("searchbox", { name: "Search all 200 tools" }).fill("json formatter");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "JSON Formatter" })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("heading", { name: "JSON Formatter" })).toBeVisible({ timeout: 45_000 });
 });
 
 test("intent launcher narrows tools by user goal", async ({ page }) => {

@@ -13,9 +13,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "app:sync": "cross-env EXPORT_STATIC=1 next build && cap sync android",
+    "app:build": "npm run app:sync && cd android && cross-env JAVA_HOME=\"C:\\Program Files\\Android\\Android Studio\\jbr\" gradlew.bat assembleDebug"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -26,7 +30,7 @@
     "gifenc": "^1.0.3",
     "heic2any": "^0.0.4",
     "lucide-react": "^0.408.0",
-    "next": "14.2.35",
+    "next": "15.5.20",
     "pdf-lib": "^1.17.1",
     "piexifjs": "^1.0.6",
     "react": "^18.3.1",
@@ -36,19 +40,25 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
     "@playwright/test": "^1.54.1",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "15.5.20",
     "postcss": "^8.4.39",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.3",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "glob": "10.5.0",
+    "minimatch": "9.0.9"
   },
   "engines": {
     "node": ">=18.18.0"

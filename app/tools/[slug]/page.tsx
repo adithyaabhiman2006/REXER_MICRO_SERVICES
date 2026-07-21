@@ -12,7 +12,7 @@ import { getToolBySlug, tools } from "@/lib/registry/tools";
 import { CATEGORIES } from "@/types/tools";
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 /** Pre-render every tool page at build time (static export friendly). */
@@ -20,8 +20,9 @@ export function generateStaticParams() {
   return tools.map((t) => ({ slug: t.slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
-  const tool = getToolBySlug(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const tool = getToolBySlug(slug);
   if (!tool) return { title: "Tool not found" };
 
   const title = `${tool.title} — Free Online Tool`;
@@ -34,8 +35,9 @@ export function generateMetadata({ params }: PageProps): Metadata {
   };
 }
 
-export default function ToolPage({ params }: PageProps) {
-  const tool = getToolBySlug(params.slug);
+export default async function ToolPage({ params }: PageProps) {
+  const { slug } = await params;
+  const tool = getToolBySlug(slug);
   if (!tool) notFound();
 
   const categoryLabel = CATEGORIES.find((c) => c.id === tool.category)?.label ?? tool.category;

@@ -22,7 +22,7 @@ studios.
 | PDF merge, split, watermark, resize, forms, signatures | Working locally with `pdf-lib` |
 | AI writing, code, image, speech, and document studios | Working; cloud use is disclosed in-tool |
 | Social media links | TOS-aware original-post assistant; no scraping or bypassing |
-| Installable PWA | Versioned shell, route, and asset caches with bounded storage |
+| Installable apps | PWA plus an Android Capacitor package with Rexer icons and splash assets |
 | Quality suite | TypeScript, ESLint, Vitest, and Playwright configured |
 | GitHub Pages deployment | Automated through `.github/workflows/deploy.yml` |
 
@@ -67,6 +67,26 @@ Open <http://localhost:3000>.
 | `npm run test:e2e` | Run Playwright browser journeys |
 | `npm run check` | Run types, lint, and unit tests |
 | `npm run format` | Format the repository with Prettier |
+
+## Android app
+
+The installable Android build is available in
+[`releases/rexer-micro-tools-android-v0.1.0.apk`](releases/rexer-micro-tools-android-v0.1.0.apk).
+Scan
+[`releases/rexer-micro-tools-android-v0.1.0-qr.png`](releases/rexer-micro-tools-android-v0.1.0-qr.png)
+to download it from the repository. Android may ask you to allow installs from
+your browser because this first build is distributed directly rather than
+through Google Play.
+
+To rebuild it on Windows with Android Studio's Java 21 runtime and Android SDK
+installed:
+
+```bash
+npm run app:build
+```
+
+The generated APK is written to
+`android/app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Deploy to GitHub Pages
 
