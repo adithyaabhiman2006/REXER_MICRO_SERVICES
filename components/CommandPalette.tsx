@@ -10,6 +10,7 @@ import { tools } from "@/lib/registry/tools";
 import { searchTools } from "@/lib/search";
 import { useAppStore } from "@/store/useAppStore";
 import { CATEGORIES } from "@/types/tools";
+import { playClick, playHover, playType, playWhoosh } from "@/lib/sound";
 
 const suggestedSlugs = [
   "image-converter",
@@ -26,6 +27,8 @@ export function CommandPalette() {
   const setOpen = useAppStore((state) => state.setCommandOpen);
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const setActiveCategory = useAppStore((state) => state.setActiveCategory);
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
   const [recentSlugs, setRecentSlugs] = useState<string[]>([]);
@@ -45,9 +48,11 @@ export function CommandPalette() {
       const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
+        if (!open && soundEnabled) playWhoosh();
         setOpen(!open);
       } else if (event.key === "/" && !isTyping && !open) {
         event.preventDefault();
+        if (soundEnabled) playWhoosh();
         setOpen(true);
       } else if (event.key === "Escape" && open) {
         setOpen(false);
@@ -55,13 +60,14 @@ export function CommandPalette() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, setOpen]);
+  }, [open, setOpen, soundEnabled]);
 
   useEffect(() => {
     if (!open) return;
     setQuery("");
     setSelected(0);
     setRecentSlugs(getRecentToolSlugs());
+    if (soundEnabled) playWhoosh();
     const timer = window.setTimeout(() => inputRef.current?.focus(), 30);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -69,12 +75,13 @@ export function CommandPalette() {
       window.clearTimeout(timer);
       document.body.style.overflow = previousOverflow;
     };
-  }, [open]);
+  }, [open, soundEnabled]);
 
   useEffect(() => setSelected(0), [query]);
 
   const openTool = (slug: string) => {
     rememberTool(slug);
+    if (soundEnabled) playClick();
     router.push(`/tools/${slug}`);
     setOpen(false);
   };
@@ -82,6 +89,7 @@ export function CommandPalette() {
   const openCategory = (category: string) => {
     setActiveCategory(category);
     setSearchQuery("");
+    if (soundEnabled) playClick();
     router.push("/#tools-heading");
     setOpen(false);
     window.setTimeout(() => document.getElementById("tools-heading")?.scrollIntoView(), 120);
@@ -108,15 +116,20 @@ export function CommandPalette() {
             type="search"
             inputMode="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              if (soundEnabled) playType();
+            }}
             onKeyDown={(event) => {
               if (event.key === "ArrowDown") {
                 event.preventDefault();
                 setSelected((value) => Math.min(value + 1, results.length - 1));
+                if (soundEnabled) playHover();
               }
               if (event.key === "ArrowUp") {
                 event.preventDefault();
                 setSelected((value) => Math.max(value - 1, 0));
+                if (soundEnabled) playHover();
               }
               if (event.key === "Enter") {
                 const liveResults = event.currentTarget.value.trim()
@@ -151,6 +164,7 @@ export function CommandPalette() {
                   key={category.id}
                   type="button"
                   onClick={() => openCategory(category.id)}
+                  onMouseEnter={() => soundEnabled && playHover()}
                   className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[.04] px-4 py-2.5 text-xs font-bold text-white/60 transition-all hover:border-rex-lime/60 hover:bg-rex-lime hover:text-black"
                 >
                   <CategoryGlyph category={category.id} className="size-3.5" />
@@ -171,7 +185,10 @@ export function CommandPalette() {
               <button
                 key={tool.slug}
                 type="button"
-                onMouseEnter={() => setSelected(index)}
+                onMouseEnter={() => {
+                  setSelected(index);
+                  if (soundEnabled) playHover();
+                }}
                 onClick={() => openTool(tool.slug)}
                 className={`group flex w-full items-center gap-4 rounded-2xl p-3 text-left transition-colors sm:p-4 ${
                   index === selected ? "bg-white text-black" : "text-white hover:bg-white/10"

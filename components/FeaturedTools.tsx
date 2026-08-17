@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Braces, FileStack, ImageIcon, Sparkles } from "lucide-react";
+import { useAppStore } from "@/store/useAppStore";
+import { playClick, playHover } from "@/lib/sound";
 
 const studios = [
   {
@@ -51,6 +53,8 @@ const studios = [
 ];
 
 export function FeaturedTools() {
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+
   return (
     <section className="mx-auto max-w-[1440px] border-x border-border px-4 py-24 sm:px-6 lg:px-10 lg:py-36">
       <div className="grid gap-8 border-b border-border pb-12 lg:grid-cols-[1fr_.6fr] lg:items-end">
@@ -74,6 +78,8 @@ export function FeaturedTools() {
           <Link
             key={title}
             href={href}
+            onMouseEnter={() => soundEnabled && playHover()}
+            onClick={() => soundEnabled && playClick()}
             className={`group relative grid min-h-[250px] overflow-hidden transition-all duration-500 sm:grid-cols-[120px_1fr_280px] lg:min-h-[290px] ${accent}`}
           >
             <div className="relative z-10 flex items-start justify-between px-2 py-7 sm:block sm:px-5 sm:py-9">

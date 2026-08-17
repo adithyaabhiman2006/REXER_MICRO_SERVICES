@@ -9,6 +9,10 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { SiteFooter } from "@/components/SiteFooter";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { CustomCursor } from "@/components/CustomCursor";
+import { FilmGrain } from "@/components/FilmGrain";
+import { PersonalizationModal } from "@/components/PersonalizationModal";
+import { ShortcutsModal } from "@/components/ShortcutsModal";
 
 // Offline-safe bundled Geist font (no build-time network fetch).
 const font = GeistSans;
@@ -73,7 +77,15 @@ export const viewport: Viewport = {
 
 // Inline script runs before paint to apply the saved theme and avoid FOUC.
 const themeInitScript = `
-(function(){try{var t=localStorage.getItem('rexer-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';}}catch(e){}})();
+(function(){try{
+  var t=localStorage.getItem('rexer-theme');
+  if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+  if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';}
+  var p=localStorage.getItem('rexer-palette');
+  if(p){document.documentElement.setAttribute('data-palette', p);}
+  var d=localStorage.getItem('rexer-density');
+  if(d){document.documentElement.setAttribute('data-density', d);}
+}catch(e){}})();
 `;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -83,10 +95,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground">
+        <FilmGrain opacity={0.03} />
+        <CustomCursor />
         <ThemeSync />
         <ScrollProgress />
         <TopNav />
         <CommandPalette />
+        <PersonalizationModal />
+        <ShortcutsModal />
         <main id="main" className="min-h-screen pb-16 pt-16 md:pb-0">
           {children}
         </main>

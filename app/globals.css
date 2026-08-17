@@ -50,6 +50,24 @@
     --ring: 74 100% 59%;
   }
 
+  /* Custom Color Palette Overrides */
+  [data-palette="swiss"] {
+    --rex-accent-from: #ffffff;
+    --rex-accent-to: #ff2a2a;
+  }
+  [data-palette="tokyo"] {
+    --rex-accent-from: #ff3388;
+    --rex-accent-to: #00f0ff;
+  }
+  [data-palette="kyoto"] {
+    --rex-accent-from: #9bc53d;
+    --rex-accent-to: #5bc0be;
+  }
+  [data-palette="solar"] {
+    --rex-accent-from: #ff5722;
+    --rex-accent-to: #ffa500;
+  }
+
   * {
     @apply border-border;
   }
@@ -93,6 +111,29 @@
     transform: translateY(-4px);
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 25px -5px rgba(207, 255, 46, 0.15);
   }
+
+  /* Holographic Border Sweep */
+  .holo-border {
+    position: relative;
+  }
+  .holo-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(90deg, #CFFF2E, #FF6846, #84F7FF, #9A86FF, #CFFF2E);
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: holo-rotate 4s linear infinite;
+  }
+  .holo-border:hover::before {
+    opacity: 1;
+  }
 }
 
 @layer utilities {
@@ -133,6 +174,12 @@
     animation: subtle-pulse 4s ease-in-out infinite;
   }
 
+  @keyframes holo-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   @keyframes marquee-slide {
     0% {
       transform: translateX(0);
@@ -158,6 +205,25 @@
     background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
     background-size: 200% 100%;
     animation: shimmer 3s infinite;
+  }
+
+  /* Clip-path Reveal on Scroll */
+  .text-reveal {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    animation: text-reveal-anim 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes text-reveal-anim {
+    from {
+      clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
   .scroll-thin {

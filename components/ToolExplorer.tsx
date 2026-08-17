@@ -10,6 +10,7 @@ import { searchTools } from "@/lib/search";
 import { tools } from "@/lib/registry/tools";
 import { useAppStore } from "@/store/useAppStore";
 import { CATEGORIES } from "@/types/tools";
+import { playClick, playHover, playType } from "@/lib/sound";
 
 const PAGE_SIZE = 24;
 
@@ -18,6 +19,8 @@ export function ToolExplorer() {
   const setSearchQuery = useAppStore((state) => state.setSearchQuery);
   const activeCategory = useAppStore((state) => state.activeCategory);
   const setActiveCategory = useAppStore((state) => state.setActiveCategory);
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+  const density = useAppStore((state) => state.density);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filtered = useMemo(() => {
@@ -63,8 +66,11 @@ export function ToolExplorer() {
               type="search"
               inputMode="search"
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="What do you want to make?"
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                if (soundEnabled) playType();
+              }}
+              placeholder="What do you want to make? (Press / to search)"
               aria-label="Search tools"
               className="h-14 w-full rounded-full border border-border bg-card pl-14 pr-24 text-sm font-semibold shadow-sm transition-all placeholder:font-medium placeholder:text-muted-foreground focus-visible:border-foreground/30 focus-visible:outline-none focus-visible:ring-0 sm:h-16 sm:text-base"
             />
@@ -74,7 +80,10 @@ export function ToolExplorer() {
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
+                onClick={() => {
+                  setSearchQuery("");
+                  if (soundEnabled) playClick();
+                }}
                 aria-label="Clear search"
                 className="absolute right-20 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
               >
@@ -87,7 +96,10 @@ export function ToolExplorer() {
               label="All"
               count={tools.length}
               active={activeCategory === "all"}
-              onClick={() => setActiveCategory("all")}
+              onClick={() => {
+                setActiveCategory("all");
+                if (soundEnabled) playClick();
+              }}
             />
             {CATEGORIES.map((category) => (
               <CategoryChip
@@ -96,7 +108,10 @@ export function ToolExplorer() {
                 count={tools.filter((tool) => tool.category === category.id).length}
                 icon={<CategoryGlyph category={category.id} className="size-4" />}
                 active={activeCategory === category.id}
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => {
+                  setActiveCategory(category.id);
+                  if (soundEnabled) playClick();
+                }}
               />
             ))}
           </div>
@@ -111,12 +126,16 @@ export function ToolExplorer() {
           <SlidersHorizontal className="size-3.5" />
           Showing {visible.length} of {filtered.length}
         </span>
-        <span className="hidden sm:inline">Select a card to begin</span>
+        <span className="hidden sm:inline">Select a card to begin · Press ? for shortcuts</span>
       </div>
 
       {visible.length > 0 ? (
         <>
-          <div className="mt-5 grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div
+            className={`mt-5 grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 ${
+              density === "compact" ? "lg:grid-cols-4 xl:grid-cols-5" : "lg:grid-cols-3 xl:grid-cols-4"
+            }`}
+          >
             {visible.map((tool, index) => (
               <ToolCard key={tool.id} tool={tool} index={index} />
             ))}
@@ -126,8 +145,11 @@ export function ToolExplorer() {
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 rounded-full px-8 font-bold"
-                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+                className="h-14 rounded-full px-8 font-bold transition-all hover:scale-105"
+                onClick={() => {
+                  setVisibleCount((count) => count + PAGE_SIZE);
+                  if (soundEnabled) playClick();
+                }}
               >
                 Load {Math.min(PAGE_SIZE, filtered.length - visible.length)} more{" "}
                 <ArrowDown className="size-4" />
@@ -147,6 +169,7 @@ export function ToolExplorer() {
             onClick={() => {
               setSearchQuery("");
               setActiveCategory("all");
+              if (soundEnabled) playClick();
             }}
           >
             Reset search
@@ -170,15 +193,18 @@ function CategoryChip({
   active: boolean;
   onClick: () => void;
 }) {
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+
   return (
     <button
       type="button"
       onClick={onClick}
+      onMouseEnter={() => soundEnabled && playHover()}
       aria-pressed={active}
       className={
         active
-          ? "inline-flex h-14 shrink-0 items-center gap-2 rounded-full bg-foreground px-5 text-xs font-black text-background sm:h-16"
-          : "inline-flex h-14 shrink-0 items-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-bold text-muted-foreground transition-all hover:border-foreground/30 hover:text-foreground sm:h-16"
+          ? "inline-flex h-14 shrink-0 items-center gap-2 rounded-full bg-foreground px-5 text-xs font-black text-background transition-transform active:scale-95 sm:h-16"
+          : "inline-flex h-14 shrink-0 items-center gap-2 rounded-full border border-border bg-card px-5 text-xs font-bold text-muted-foreground transition-all hover:border-foreground/30 hover:text-foreground active:scale-95 sm:h-16"
       }
     >
       {icon}

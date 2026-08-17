@@ -9,6 +9,8 @@ import { CategoryGlyph } from "@/components/CategoryGlyph";
 import { rememberTool } from "@/lib/recent-tools";
 import type { Tool, ToolCategory } from "@/types/tools";
 import { CATEGORIES } from "@/types/tools";
+import { useAppStore } from "@/store/useAppStore";
+import { playClick, playHover } from "@/lib/sound";
 
 const categoryColor: Record<ToolCategory, string> = {
   media: "bg-rex-coral",
@@ -61,8 +63,11 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
   const [transform, setTransform] = useState("");
 
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+  const motionMode = useAppStore((state) => state.motionMode);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || motionMode === "minimal") return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -85,11 +90,12 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   };
 
   return (
-    <article className="h-full bg-background">
+    <article className="h-full bg-background holo-border">
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        onMouseEnter={() => soundEnabled && playHover()}
         style={{
           transform: transform || undefined,
           transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -98,7 +104,10 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
       >
         <Link
           href={`/tools/${tool.slug}`}
-          onClick={() => rememberTool(tool.slug)}
+          onClick={() => {
+            rememberTool(tool.slug);
+            if (soundEnabled) playClick();
+          }}
           aria-label={`Open ${tool.title}`}
           className="group relative flex h-full min-h-[360px] flex-col overflow-hidden rounded-2xl border border-border/80 bg-background transition-colors hover:border-foreground/30 hover:bg-card"
         >

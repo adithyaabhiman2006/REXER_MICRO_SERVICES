@@ -6,6 +6,7 @@ import { IntentLauncher } from "@/components/IntentLauncher";
 import { ToolExplorer } from "@/components/ToolExplorer";
 import { LiveDesk } from "@/components/LiveDesk";
 import { SmartStart } from "@/components/SmartStart";
+import { QuickToolPlayground } from "@/components/QuickToolPlayground";
 
 export default function HomePage() {
   return (
@@ -72,6 +73,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <QuickToolPlayground />
 
       <LiveDesk />
       <IntentLauncher />

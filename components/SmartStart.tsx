@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 
 import { tools } from "@/lib/registry/tools";
+import { useAppStore } from "@/store/useAppStore";
+import { playClick, playSuccess, playHover } from "@/lib/sound";
+import { useInView } from "@/lib/useInView";
 
 const WORKFLOW_KEY = "rexer-pinned-workflow";
 
@@ -125,29 +128,30 @@ export function SmartStart() {
   const [selection, setSelection] = useState<{ name: string; size: number; kind: DetectionKey } | null>(null);
   const [dragging, setDragging] = useState(false);
   const [pinned, setPinned] = useState<string | null>(null);
+  const [sectionRef, inView] = useInView({ threshold: 0.1 });
+
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
 
   useEffect(() => {
     try {
       setPinned(window.localStorage.getItem(WORKFLOW_KEY));
-    } catch {
-      // Private mode can disable storage; workflows still remain usable.
-    }
+    } catch {}
   }, []);
 
   const chooseFile = (file?: File) => {
     if (!file) return;
     setSelection({ name: file.name, size: file.size, kind: detect(file) });
+    if (soundEnabled) playSuccess();
   };
 
   const pinWorkflow = (id: string) => {
     const next = pinned === id ? null : id;
     setPinned(next);
+    if (soundEnabled) playClick();
     try {
       if (next) window.localStorage.setItem(WORKFLOW_KEY, next);
       else window.localStorage.removeItem(WORKFLOW_KEY);
-    } catch {
-      // The visual state still works for the current session.
-    }
+    } catch {}
   };
 
   const result = selection ? detections[selection.kind] : null;
@@ -155,7 +159,10 @@ export function SmartStart() {
 
   return (
     <section id="smart-start" className="scroll-mt-16 border-b border-border bg-[#090a0c] text-white">
-      <div className="mx-auto max-w-[1440px] border-x border-white/10 px-4 py-24 sm:px-6 lg:px-10 lg:py-36">
+      <div
+        ref={sectionRef}
+        className="mx-auto max-w-[1440px] border-x border-white/10 px-4 py-24 sm:px-6 lg:px-10 lg:py-36"
+      >
         <div className="grid gap-7 lg:grid-cols-[1fr_.55fr] lg:items-end">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[.24em] text-rex-lime">
@@ -173,17 +180,32 @@ export function SmartStart() {
         </div>
 
         <div className="mt-12 grid overflow-hidden rounded-[2rem] border border-white/15 lg:grid-cols-2">
+          {/* Dropzone with concentric pulsing rings */}
           <div
-            onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
+            onDragEnter={(event) => {
+              event.preventDefault();
+              setDragging(true);
+              if (soundEnabled) playHover();
+            }}
             onDragOver={(event) => event.preventDefault()}
-            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }}
+            onDragLeave={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false);
+            }}
             onDrop={(event) => {
               event.preventDefault();
               setDragging(false);
               chooseFile(event.dataTransfer.files[0]);
             }}
-            className={`relative flex min-h-[360px] flex-col justify-between p-7 transition-colors sm:p-10 ${dragging ? "bg-rex-lime text-black" : "bg-white/[.035]"}`}
+            className={`relative flex min-h-[360px] flex-col justify-between p-7 transition-all sm:p-10 ${
+              dragging ? "bg-rex-lime text-black" : "bg-white/[.035]"
+            }`}
           >
+            {dragging && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div className="size-48 animate-ping rounded-full border-2 border-black/20" />
+                <div className="absolute size-72 animate-ping rounded-full border-2 border-black/10 [animation-delay:0.2s]" />
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <p className="font-mono text-[9px] font-bold uppercase tracking-[.2em] opacity-45">01 / Smart detector</p>
               <ShieldCheck className="size-5 text-rex-lime" />
@@ -212,7 +234,10 @@ export function SmartStart() {
               />
               <button
                 type="button"
-                onClick={() => inputRef.current?.click()}
+                onClick={() => {
+                  if (soundEnabled) playClick();
+                  inputRef.current?.click();
+                }}
                 className="h-12 rounded-full bg-white px-6 text-xs font-black text-black transition-transform hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rex-lime"
               >
                 Browse this device
@@ -220,21 +245,46 @@ export function SmartStart() {
             </div>
           </div>
 
-          <div className={`relative min-h-[360px] p-7 text-black transition-colors sm:p-10 ${result?.color ?? "bg-[#E9E7DF]"}`} aria-live="polite">
+          {/* Result Card with 3D Flip feel */}
+          <div
+            className={`relative min-h-[360px] p-7 text-black transition-all duration-500 sm:p-10 ${
+              result?.color ?? "bg-[#E9E7DF]"
+            }`}
+            aria-live="polite"
+          >
             {selection && result ? (
-              <>
+              <div className="animate-fade-in">
                 <div className="flex items-start justify-between gap-4">
-                  <span className="grid size-14 place-items-center rounded-full border border-black/20"><ResultIcon className="size-5" /></span>
-                  <button type="button" onClick={() => setSelection(null)} className="grid size-9 place-items-center rounded-full border border-black/15" aria-label="Clear selected file"><X className="size-4" /></button>
+                  <span className="grid size-14 place-items-center rounded-full border border-black/20">
+                    <ResultIcon className="size-5" />
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelection(null);
+                      if (soundEnabled) playClick();
+                    }}
+                    className="grid size-9 place-items-center rounded-full border border-black/15 transition-transform hover:scale-105"
+                    aria-label="Clear selected file"
+                  >
+                    <X className="size-4" />
+                  </button>
                 </div>
-                <p className="mt-8 truncate font-mono text-[10px] font-bold uppercase tracking-[.16em] text-black/45">{selection.name} · {readableSize(selection.size)}</p>
+                <p className="mt-8 truncate font-mono text-[10px] font-bold uppercase tracking-[.16em] text-black/45">
+                  {selection.name} · {readableSize(selection.size)}
+                </p>
                 <h3 className="mt-3 text-4xl font-black tracking-[-.06em]">{result.label}</h3>
                 <p className="mt-2 text-sm font-semibold text-black/50">{result.detail}</p>
                 <div className="mt-8 divide-y divide-black/15 border-y border-black/15">
                   {result.slugs.map((slug, index) => {
                     const tool = tools.find((item) => item.slug === slug);
                     return tool ? (
-                      <Link key={slug} href={`/tools/${slug}`} className="group flex items-center gap-4 py-4">
+                      <Link
+                        key={slug}
+                        href={`/tools/${slug}`}
+                        onMouseEnter={() => soundEnabled && playHover()}
+                        className="group flex items-center gap-4 py-4"
+                      >
                         <span className="font-mono text-[9px] font-bold text-black/35">0{index + 1}</span>
                         <span className="flex-1 text-sm font-black">{tool.title}</span>
                         <ArrowUpRight className="size-4 transition-transform group-hover:rotate-45" />
@@ -242,12 +292,21 @@ export function SmartStart() {
                     ) : null;
                   })}
                 </div>
-              </>
+              </div>
             ) : (
               <div className="flex h-full min-h-[290px] flex-col justify-between">
-                <div className="flex items-center justify-between"><p className="font-mono text-[9px] font-bold uppercase tracking-[.2em] text-black/40">02 / Recommendation</p><Sparkles className="size-5" /></div>
-                <p className="max-w-md text-4xl font-black leading-[.92] tracking-[-.06em] sm:text-5xl">THE RIGHT TOOLS WILL APPEAR HERE.</p>
-                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.14em] text-black/40"><Check className="size-3.5" /> Detection happens instantly</p>
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[.2em] text-black/40">
+                    02 / Recommendation
+                  </p>
+                  <Sparkles className="size-5" />
+                </div>
+                <p className="max-w-md text-4xl font-black leading-[.92] tracking-[-.06em] sm:text-5xl">
+                  THE RIGHT TOOLS WILL APPEAR HERE.
+                </p>
+                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.14em] text-black/40">
+                  <Check className="size-3.5" /> Detection happens instantly
+                </p>
               </div>
             )}
           </div>
@@ -255,15 +314,27 @@ export function SmartStart() {
 
         <div className="mt-24 flex items-end justify-between gap-8 border-b border-white/15 pb-8">
           <div>
-            <p className="flex items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[.2em] text-rex-violet"><Route className="size-3.5" /> Repeatable recipes</p>
+            <p className="flex items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[.2em] text-rex-violet">
+              <Route className="size-3.5" /> Repeatable recipes
+            </p>
             <h3 className="mt-3 text-4xl font-black tracking-[-.06em] sm:text-6xl">DON&apos;T STOP AT ONE TOOL.</h3>
           </div>
-          <p className="hidden max-w-xs text-right text-xs font-semibold leading-relaxed text-white/35 md:block">Follow a proven sequence. Pin the one you use most and it will be waiting next time.</p>
+          <p className="hidden max-w-xs text-right text-xs font-semibold leading-relaxed text-white/35 md:block">
+            Follow a proven sequence. Pin the one you use most and it will be waiting next time.
+          </p>
         </div>
 
         <div>
-          {workflows.map((workflow) => (
-            <article key={workflow.id} className={`group grid border-b border-white/15 py-7 transition-colors lg:grid-cols-[80px_1fr_1.1fr_auto] lg:items-center lg:gap-7 ${pinned === workflow.id ? "text-black " + workflow.color : "hover:bg-white/[.035]"}`}>
+          {workflows.map((workflow, idx) => (
+            <article
+              key={workflow.id}
+              style={{
+                transitionDelay: `${idx * 60}ms`,
+              }}
+              className={`group grid border-b border-white/15 py-7 transition-colors lg:grid-cols-[80px_1fr_1.1fr_auto] lg:items-center lg:gap-7 ${
+                pinned === workflow.id ? "text-black " + workflow.color : "hover:bg-white/[.035]"
+              }`}
+            >
               <span className="px-2 font-mono text-[9px] font-bold opacity-40">/{workflow.number}</span>
               <div className="px-2">
                 <h4 className="mt-2 text-3xl font-black tracking-[-.055em] lg:mt-0">{workflow.title}</h4>
@@ -275,7 +346,13 @@ export function SmartStart() {
                   return tool ? (
                     <li key={slug} className="flex items-center gap-2">
                       {index > 0 && <ArrowUpRight className="size-3 rotate-45 opacity-30" />}
-                      <Link href={`/tools/${slug}`} className="rounded-full border border-current/20 px-3 py-2 text-[10px] font-black transition-colors hover:bg-black hover:text-white">{tool.title}</Link>
+                      <Link
+                        href={`/tools/${slug}`}
+                        onMouseEnter={() => soundEnabled && playHover()}
+                        className="rounded-full border border-current/20 px-3 py-2 text-[10px] font-black transition-colors hover:bg-black hover:text-white"
+                      >
+                        {tool.title}
+                      </Link>
                     </li>
                   ) : null;
                 })}
@@ -284,9 +361,10 @@ export function SmartStart() {
                 type="button"
                 onClick={() => pinWorkflow(workflow.id)}
                 aria-pressed={pinned === workflow.id}
-                className="mx-2 mt-5 flex h-10 items-center justify-center gap-2 rounded-full border border-current/20 px-4 text-[9px] font-black uppercase tracking-[.12em] lg:mt-0"
+                className="mx-2 mt-5 flex h-10 items-center justify-center gap-2 rounded-full border border-current/20 px-4 text-[9px] font-black uppercase tracking-[.12em] lg:mt-0 transition-transform hover:scale-105"
               >
-                <Pin className={`size-3.5 ${pinned === workflow.id ? "fill-current" : ""}`} /> {pinned === workflow.id ? "Pinned" : "Pin"}
+                <Pin className={`size-3.5 ${pinned === workflow.id ? "fill-current" : ""}`} />{" "}
+                {pinned === workflow.id ? "Pinned" : "Pin"}
               </button>
             </article>
           ))}
