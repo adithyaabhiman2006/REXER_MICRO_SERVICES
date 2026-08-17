@@ -42,7 +42,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
         with:
-          enablement: false
+          enablement: true
       - name: Build static export
         env:
           EXPORT_STATIC: "1"

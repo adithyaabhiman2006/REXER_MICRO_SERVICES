@@ -60,3 +60,10 @@ test("workflow pin stays on this device", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("article").filter({ hasText: "SHIP AN IMAGE" }).getByRole("button", { name: "Pinned" })).toBeVisible();
 });
+
+test("shows custom 404 page for unmatched routes and unknown tools", async ({ page }) => {
+  await page.goto("/tools/nonexistent-test-tool");
+  await expect(page.getByRole("heading", { name: /THIS ROUTE DOESN’T EXIST/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Browse All 200 Tools/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /PDF Merge & Combine/i })).toBeVisible();
+});

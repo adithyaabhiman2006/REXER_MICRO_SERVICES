@@ -15,6 +15,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/** In static export, only pre-rendered tool paths are valid. */
+export const dynamicParams = false;
+
 /** Pre-render every tool page at build time (static export friendly). */
 export function generateStaticParams() {
   return tools.map((t) => ({ slug: t.slug }));
